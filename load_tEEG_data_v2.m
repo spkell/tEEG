@@ -12,7 +12,8 @@
 function simian = load_tEEG_data_v2(subject, stim, fixation_pos)
 
     %Sets path for tEEG data
-    directory_path = '/Users/sean/Documents/MATLAB/VNL/projects/tEEG/tEEG_checkerboard_data'; %Change depending on desired path
+    %Change depending on desired path
+    directory_path = '~/Documents/GitHub/tEEG/tEEG_checkerboard_data';
     %directory_path = '~/VNL/projects/tEEG/DataMat'; %dir path in lab
 
     %Build requested file name in correct path
