@@ -1,5 +1,5 @@
 # tEEG
-Collection of files to be used for MVPA of visual evoked potentials generated with tripolar EEG.
+Collection of files used for MVPA of visual evoked potentials generated with tripolar EEG.
 
 The tEEG dataset was generated at UNR, Nevada.
 
