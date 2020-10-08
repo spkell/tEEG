@@ -17,7 +17,7 @@
 %Example: tEEG_timeseries_classification_v3()
 
 
-function class_avg = tEEG_timeseries_classification_v3()
+function class_avg = tEEG_timeseries_classification_v3(fix_pos,EEG)
     % Prepare MVPA
 
     % reset citation list
@@ -35,7 +35,7 @@ function class_avg = tEEG_timeseries_classification_v3()
 
         %loads formatted dataset
         %Params = subject(1:10), fixation_position(1:7), (t/e)EEG(1:2)
-        ds_tl = tEEG_ds_format_v3(subject,1,1);
+        ds_tl = tEEG_ds_format_v3(subject,fix_pos,EEG);
 
         % just to check everything is ok
         cosmo_check_dataset(ds_tl);
