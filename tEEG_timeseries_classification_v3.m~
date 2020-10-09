@@ -26,9 +26,10 @@ ntrials = 10;
 % reset citation list
 cosmo_check_external('-tic');
 
-time_values = (1:494); % first dim (channels got nuked)
-class_avg = zeros(1,size(time_values,2));
+class_avg = zeros(1,494);
+
 n_subjects = 10; %all subjects
+time_values = (1:494); % first dim (channels got nuked)
 
 figure; %new figure for superposition with individual participants
 subplot(2,1,1);
@@ -45,7 +46,7 @@ for subject=1:n_subjects
     % reset chunks so each one has an equal number of large and small target
     % trials. Each test set will contain 1 large and 1 small target.
     % assume all trials are independent (although not really true for the data collection method as trials occurr without an inter-trial interval)
-    ds_tl.sa.chunks = (1:size(ds_tl.samples,1))';
+    ds_tl.sa.chunks = (1:size(ds_tl.samples,1))'; %TODO: Does ntrials effect this?
     % create as many chunks as there are trials for each dataset (NOTE: not sure if last argument is defined in the best possible way here if ntrials differs for each dataset)
     ds_tl.sa.chunks = cosmo_chunkize(ds_tl, ntrials);
 
@@ -131,9 +132,9 @@ for i = 1:494
 end
 
 
-%Plot average results with 95% confidence interval overlay in same figure
+%Plot Results
 subplot(2,1,2);
-continuous_error_bars(class_avg, time_values, confidence_interval, 0)
+plot(time_values,class_avg);
 
 xlim([min(time_values),max(time_values)]);
 ylabel('classification accuracy (chance=.5)');

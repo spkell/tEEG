@@ -21,6 +21,8 @@
 % line.
 %function class_avg = tEEG_timeseries_classification_v3()
     % Prepare MVPA
+    
+    ntrials = 20;
 
     % reset citation list
     cosmo_check_external('-tic');
@@ -36,8 +38,9 @@
     for subject=1:n_subjects
 
         %loads formatted dataset
-        %Params = subject(1:10), fixation_position(1:7), (t/e)EEG(1:2)
-        ds_tl = tEEG_ds_format_v3(subject,1,1);
+        %Params = subject(1:10), fixation_position(1:7), (t/e)EEG(1:2),
+        %trials
+        ds_tl = tEEG_ds_format_v3(subject,1,1,ntrials);
         
         % just to check everything is ok
         cosmo_check_dataset(ds_tl);
@@ -47,7 +50,7 @@
         % assume all trials are independent (although not really true for the data collection method as trials occurr without an inter-trial interval)
         ds_tl.sa.chunks = (1:size(ds_tl.samples,1))';
         % create as many chunks as there are trials for each dataset (NOTE: not sure if last argument is defined in the best possible way here if ntrials differs for each dataset)
-        ds_tl.sa.chunks = cosmo_chunkize(ds_tl,100);
+        ds_tl.sa.chunks = cosmo_chunkize(ds_tl,ntrials);
 
         % do a take-one-fold out cross validation.
         % except when using a splithalf correlation measure it is important that

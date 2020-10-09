@@ -54,7 +54,7 @@ function ds = tEEG_ds_format_v3(subject, fixation_pos, eeg_type, ntrials)
    
    %constructs feature attributes of dataset          % RM: may want to construct these in the full 3D matrix space, to be sure order is correct
    ds.fa.chan = repmat((1:nchans), [1 ntimepoints]);  % RM: pull the 494 from the data loaded initially so not hardcoded
-   ds.fa.time = repelem((1:ntimepoints), nchans); %be cautious of participant with <494 time_points
+   ds.fa.time = repelem((1:ntimepoints), nchans);
    
    %constructs attributes of dataset
    

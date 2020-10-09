@@ -4,9 +4,11 @@
 %
 %Purpose: Plot continous data with similarly continous error bars.
 
-function continuous_error_bars(data_vector, time_vector, error_magnitude)
+function continuous_error_bars(data_vector, time_vector, error_magnitude, new_fig)
 
-    figure;
+    if new_fig
+        figure;
+    end
     x = time_vector;
     y = data_vector;
     dy = error_magnitude;
