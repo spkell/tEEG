@@ -10,11 +10,11 @@
 %
 %TODO: change directory path in load_tEEG_data()
 
-function plot_tEEG_electrode_avg(subject, stim, fixation_pos, electrode)
+function plot_tEEG_electrode_avg(subject, fixation_pos, stim, electrode)
     
-    time_series = load_tEEG_data(subject, stim, fixation_pos);
+    time_series = load_tEEG_data(subject, fixation_pos, stim);
     
-    %finds average frequency of a given electrode every 100ms for ~49.4s
+    %finds average frequency of a given electrode every 1ms for ~494ms
     average = avg_electrode_freq(time_series,electrode);
     
     ax = axes;

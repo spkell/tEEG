@@ -11,7 +11,7 @@ function dif_map = avg_tEEG_sl_map_dif(map_1, map_2)
     dif_map = zeros(1,size(map_1.samples, 2));
     
     %finds difference between the 2 maps
-    for i = 1:size(map_1.samples, 2)
+    for i = 1:size(map_1.samples, 2) % RM: can this be vectorized?  i need to look at structure of matrices going in, but why not >> map_1.samples - map_2.samples (element-by-element subtraction)
         dif_map(i) = map_1.samples(i) - map_2.samples(i);
     end
     

@@ -10,7 +10,7 @@
 %
 %TODO: change directory path in load_tEEG_data()
 
-function plot_tEEG_electrode_avg(subject, stim, fixation_pos, electrode)
+function plot_tEEG_electrode_avg_RM(subject, stim, fixation_pos, electrode)
     
     time_series = load_tEEG_data(subject, stim, fixation_pos);
     
