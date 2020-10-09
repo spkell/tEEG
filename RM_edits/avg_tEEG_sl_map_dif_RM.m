@@ -6,7 +6,7 @@
 % accuracy between any given searchlight outputs of 
 % tEEG_timeseries_classification_v2() (i.e. tEEG, eEEG output)
 
-function dif_map = avg_tEEG_sl_map_dif(map_1, map_2)
+function dif_map = avg_tEEG_sl_map_dif_RM(map_1, map_2)
     
     dif_map = zeros(1,size(map_1.samples, 2));
     

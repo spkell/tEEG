@@ -1,6 +1,6 @@
 %Author: Sean Kelly & Pr. Mruczek
 %Filename: tEEG_ds_format_v3.m
-%Date: 10/8/20
+%Date: 10/5/20
 %
 %Purpose: Create tEEG dataset structure to use as sample by feature dataset
 % for use in CosmoMVPA classifier analysis.
@@ -9,43 +9,43 @@
 % performance for one given fixation point to differentiate between
 % large and small checker stimuli.
 %
-% Function takes integer params of subject, fix_pos, and EEG_type, which
-% will be extracted from tEEG_conditions(). The additional input is the
-% number of trials that wil be considered for each sample.
-%
-%Example: tEEG_ds_format_v1(1,1,1,50)
+%Example: tEEG_ds_format_v1(1,1,1)
 
-function ds = tEEG_ds_format_v3(subject, fixation_pos, eeg_type, ntrials)
-    
-    %identify string representations of trial parameters
-    conditions = tEEG_conditions();
-    subject_id = conditions{1}{subject};
-    fix_pos = conditions{2}{fixation_pos};
-    eeg_chans = conditions{3}{eeg_type};
-    stim = conditions{4}; %can use as function parameter
+function ds = tEEG_ds_format_v3_RM(subject, fixation_position, channel)
+
+    %identify string
+    conditions = tEEG_conditions(subject, fixation_position); % defines list of subjects, and conditions
     
     %Load data files for both stimuli
-    %12 chans x 494 timepoints x ~100 trials for lg_ds and sm_ds
-    lg_ds = load_tEEG_data_v2(subject_id, fix_pos, stim{1});
-    sm_ds = load_tEEG_data_v2(subject_id, fix_pos, stim{2}); 
-    
+    stim = {'large','small'};
+    lg_ds = load_tEEG_data_v2(conditions{1}, stim{1}, conditions{2});
+    lg_ds = lg_ds.simian; %12 chans x 494 timepoints x 100 trials
+    sm_ds = load_tEEG_data_v2(conditions{1}, stim{2}, conditions{2}); 
+    sm_ds = sm_ds.simian; %12 chans x 494 timepoints x 100 trials
+        
    %Select tEEG for channels 1-6, and eEEG for channels 7-12
-   %Results in 6 chans x 494 timepoints x n_trials for lg_ds and sm_ds
-   if strcmp(eeg_chans,'tEEG')
-       lg_ds = lg_ds.data(1:6,:,1:ntrials); %TODO: take random mix of trials instead
-       sm_ds = sm_ds.data(1:6,:,1:ntrials);
+   %Results in 6 chans x 494 timepoints x 100 trials for lg_ds and sm_ds
+   channel_types = {'tEEG', 'eEEG'};  % RM: consider putting this in tEEG_conditions.m
+   if strcmp(channel_types{channel},'tEEG')
+       lg_ds = lg_ds.data(1:6,:,:);
+       sm_ds = sm_ds.data(1:6,:,:);
    else
-       lg_ds = lg_ds.data(7:12,:,1:ntrials);
-       sm_ds = sm_ds.data(7:12,:,1:ntrials);
+       lg_ds = lg_ds.data(7:12,:,:);
+       sm_ds = sm_ds.data(7:12,:,:);
    end
    nchans = size(lg_ds,1); % RM: this is somewhat hardcoded, as it depends on the above selection code.  but should be ok because it should never change
 
    %Extract number of time points and trials for each stimuli
    ntimepoints = size(lg_ds,2); %should be same for both lg and sm
-    
+   ntrials_lg = size(lg_ds,3);
+   ntrials_sm = size(sm_ds,3);
+
+   % RM: here is a good place to trim down to 100 trials (or number
+   % requested as an argument)
+   
    %reshape dataset
-   lg_ds = squeeze(reshape (lg_ds, [], 1, ntrials));
-   sm_ds = squeeze(reshape (sm_ds, [], 1, ntrials));
+   lg_ds = squeeze(reshape (lg_ds, [], 1, ntrials_lg));
+   sm_ds = squeeze(reshape (sm_ds, [], 1, ntrials_sm));
    lg_ds = lg_ds'; % RM: add some comments here : ntrials X (nchans*ntimepoints)
    sm_ds = sm_ds';
    
@@ -70,25 +70,25 @@ function ds = tEEG_ds_format_v3(subject, fixation_pos, eeg_type, ntrials)
    ds.a.fdim.values = values;
    
    %constructs sample attributes of dataset
-   labels_lg = repmat({'large'}, ntrials,1);
-   labels_sm = repmat({'small'}, ntrials,1);
+   labels_lg = repmat({'large'}, ntrials_lg,1);
+   labels_sm = repmat({'small'}, ntrials_sm,1);
    labels = [labels_lg; labels_sm];
    ds.sa.labels = labels;
    
    %each component of each epoch is an independent chunk
-   chunks = (1:(2 * ntrials));
+   chunks = (1:(ntrials_lg + ntrials_sm));
    ds.sa.chunks = chunks';
    
    %repeats target code (1,2) for the amount of trials in the sample and
    %concatenates them
-   targets_lg = repelem(1,ntrials);
-   targets_sm = repelem(2,ntrials);
+   targets_lg = repelem(1,ntrials_lg);
+   targets_sm = repelem(2,ntrials_sm);
    targets_lg = targets_lg';
    targets_sm = targets_sm';
    targets = [targets_lg; targets_sm];
    ds.sa.targets = targets;
    
    ds.sa.trialinfo(:,1) = targets;
-   ds.sa.trialinfo(:,2) = [(1:ntrials)'; (1:ntrials)'];
+   ds.sa.trialinfo(:,2) = [(1:ntrials_lg)'; (1:ntrials_sm)'];
    
 end

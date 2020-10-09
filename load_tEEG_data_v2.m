@@ -1,15 +1,15 @@
 %Author: Sean Kelly & Pr. Mruczek
 %Filename: load_tEEG_data_v2.m
-%Date: 10/5/20
+%Date: 10/8/20
 %
 %Purpose:
-% Function loads tEEG data file given subject, stim,
-% fixation position, as string inputs. Function returns struct containing 
+% Function loads tEEG data file given subject, fixation position,
+% stim as string inputs. Function returns struct containing 
 % data pertaining to given params
 %
-%Example: load_tEEG_data_v2('0341', 'large', 'UpperRight')
+%Example: load_tEEG_data_v2('0341', 'UpperRight', 'large')
 
-function simian = load_tEEG_data_v2(subject, stim, fixation_pos)
+function data = load_tEEG_data_v2(subject, fixation_pos, stim)
 
     %Sets path for tEEG data
     %Change depending on desired path
@@ -17,13 +17,18 @@ function simian = load_tEEG_data_v2(subject, stim, fixation_pos)
     %directory_path = '~/VNL/projects/tEEG/DataMat'; %dir path in lab
 
     %Build requested file name in correct path
-    fn = fullfile(directory_path,['tEEG_' subject '_' stim '_' fixation_pos '.mat']);
+    fname = ['tEEG_' subject '_' stim '_' fixation_pos '.mat']; % filename (no path)
+    fn = fullfile(directory_path,fname);
     
     %checks if parameters match a given file
     if exist(fn,'file')
-        simian = load(fn); %file exists, load file
+        fprintf('loading %s...\n',fname);
+        simian = load(fname); %file exists, load file
+        data = simian.simian;
+        fprintf('\tn timepoints = %d\n',size(data.data,2)) %trial info
+        fprintf('\tn trials     = %d\n',size(data.data,3))
     else
-        error("No file was located matching the given parameters.")
+        error("File (%s) not found in %s",fname,directory_path)
     end
     
     

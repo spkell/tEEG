@@ -9,7 +9,7 @@
 %
 %Example: load_tEEG_data_v2('0341', 'large', 'UpperRight')
 
-function simian = load_tEEG_data_v2(subject, stim, fixation_pos)
+function simian = load_tEEG_data_v2_RM(subject, stim, fixation_pos)
 
     %Sets path for tEEG data
     %Change depending on desired path
