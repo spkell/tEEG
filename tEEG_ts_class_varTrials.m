@@ -51,7 +51,7 @@ for eeg_type=1:2 %tEEG and eEEG
         for subject=1:nsubjects
 
             %runs ts classification
-            sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type, trial_count+2); %+2 since 1,2 trials aren't accepted by classifier
+            sample_map = tEEG_ts_class_backend(2, fix_pos, eeg_type, trial_count+2); %trial_count+2 since 1,2 trials aren't accepted by classifier
             class_raw_mat(subject,:) = sample_map;
         end
 
@@ -79,4 +79,5 @@ xlim([min(3),max(ntrials)]);
 ylabel('Area Under Curve (Class Accuracy * ms)');
 xlabel('Trials Used to Train Classifier');
 title('ROC Curve: tEEG vs eEEG');
-legend('tEEG','eEEG')
+legend('tEEG','eEEG');
+MarkPlot('Fix_pos:center');
