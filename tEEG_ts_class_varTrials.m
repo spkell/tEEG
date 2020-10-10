@@ -4,7 +4,7 @@
 %
 %Purpose: This classifier performs MVPA analyses on tEEG and eEEG data,
 % and plots area under curve of tEEG and eEEG classification as ntrials
-% is decreased from 100->3. The area under the curve represents the 
+% decreases from 100->3. The area under the curve represents the 
 % integral of classification of above chance large vs small stimuli.
 %
 %Runtime: 2eeg_types * (100trials * 12seconds * 10subjects) / 2 = ~3.3hrs
@@ -27,7 +27,7 @@ cosmo_check_external('-tic');
 
 time_values = (1:494); % first dim (channels got nuked)
 %nsubjects = 10; %all subjects
-nsubjects = 1; %debug with only first subject to reduce time complexity by 10x
+nsubjects = 1; %debug with only 1 subject to reduce time complexity by 10x
 
 %Preallocate memory to store roc for both tEEG and eEEG
 roc_eegs(:,ntrials-2) = zeros(2,1); %2eeg_types * 98trials
@@ -47,11 +47,11 @@ for eeg_type=1:2 %tEEG and eEEG
         %Preallocate memory to store classification of each subject
         class_raw_mat = class_raw_mat_zeros;
 
-        %Runs timeseries classification for eacvh subject
+        %Runs timeseries classification for each subject
         for subject=1:nsubjects
 
             %runs ts classification
-            sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type, trial_count+2);
+            sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type, trial_count+2); %+2 since 1,2 trials aren't accepted by classifier
             class_raw_mat(subject,:) = sample_map;
         end
 
