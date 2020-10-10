@@ -7,7 +7,7 @@
 % decreases from 100->3. The area under the curve represents the 
 % integral of classification of above chance large vs small stimuli.
 %
-%Runtime: 2eeg_types * (100trials * 12seconds)/ * 10subjects = ~3.3hrs
+%Runtime: 2eeg_types * 10subjects * (100trials * 12seconds)/2 = ~3.3hrs
 %
 % * targets: large vs. small checker stimuli
 % * chunks: program assumes that every trial is independent
@@ -26,8 +26,8 @@ ntrials = 100;
 cosmo_check_external('-tic');
 
 time_values = (1:494); % first dim (channels got nuked)
-%nsubjects = 10; %all subjects
-nsubjects = 1; %debug with only 1 subject to reduce time complexity by 10x
+nsubjects = 10; %all subjects
+%nsubjects = 1; %debug with only 1 subject to reduce time complexity by 10x
 
 %Preallocate memory to store roc for both tEEG and eEEG
 roc_eegs(:,ntrials-2) = zeros(2,1); %2eeg_types * 98trials
@@ -51,8 +51,8 @@ for eeg_type=1:2 %tEEG and eEEG
         for subject=1:nsubjects
 
             %runs ts classification
-            sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type, trial_count+2); %+2 since 1,2 trials aren't accepted by classifier
-            class_raw_mat(subject,:) = sample_map;
+            sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type, trial_count+2); %trial_count+2 since 1,2 trials aren't accepted by classifier
+            class_raw_mat(subject,:) = sample_map; %1 x 494 (classifier performance)
         end
 
         %Average classification accuracy across all subjects for each timepoint
@@ -63,7 +63,6 @@ for eeg_type=1:2 %tEEG and eEEG
     
     %store area under curve for each number of trials
     roc_eegs(eeg_type,:) = roc;
-    
 end
 
 figure; %figure to display roc of both eeg types
@@ -80,4 +79,5 @@ xlim([min(3),max(ntrials)]);
 ylabel('Area Under Curve (Class Accuracy * ms)');
 xlabel('Trials Used to Train Classifier');
 title('ROC Curve: tEEG vs eEEG');
-legend('tEEG','eEEG')
+legend('tEEG','eEEG');
+MarkPlot('Fix_pos:center');

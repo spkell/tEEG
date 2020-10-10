@@ -26,8 +26,8 @@ ntrials = 100;
 cosmo_check_external('-tic');
 
 time_values = (1:494); % first dim (channels got nuked)
-%nsubjects = 10; %all subjects
-nsubjects = 1; %debug with only 1 subject to reduce time complexity by 10x
+nsubjects = 10; %all subjects
+%nsubjects = 1; %debug with only 1 subject to reduce time complexity by 10x
 
 %Preallocate memory to store roc for both tEEG and eEEG
 roc_eegs(:,ntrials-2) = zeros(2,1); %2eeg_types * 98trials
@@ -45,24 +45,25 @@ for eeg_type=1:2 %tEEG and eEEG
     for trial_count=1:ntrials-2
 
         %Preallocate memory to store classification of each subject
-        class_raw_mat = class_raw_mat_zeros;
+        class_raw_mat = class_raw_mat_zeros; %10 x 494
 
         %Runs timeseries classification for each subject
         for subject=1:nsubjects
 
             %runs ts classification
-            sample_map = tEEG_ts_class_backend(2, fix_pos, eeg_type, trial_count+2); %trial_count+2 since 1,2 trials aren't accepted by classifier
-            class_raw_mat(subject,:) = sample_map;
+            sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type, trial_count+2); %trial_count+2 since 1,2 trials aren't accepted by classifier
+            class_raw_mat(subject,:) = sample_map; %10subjects x 494(classifier performance)
         end
 
         %Average classification accuracy across all subjects for each timepoint
-        class_avg = mean(class_raw_mat,1);
+        class_avg = mean(class_raw_mat,1); %1 x 494
+        
         %store area under curve for each classification plot for each 
-        roc(trial_count) = integral_sl_map(time_values,class_avg);
+        roc(trial_count) = integral_sl_map(time_values,class_avg); %1eeg x 98trials
     end
     
     %store area under curve for each number of trials
-    roc_eegs(eeg_type,:) = roc;
+    roc_eegs(eeg_type,:) = roc; %2eegs x 98trials
 end
 
 figure; %figure to display roc of both eeg types
