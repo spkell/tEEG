@@ -8,7 +8,7 @@
 %Example: integral_sl_map((1:494),(1:494))
 
 function res_integral = integral_sl_map(time,map)
-    map = map - 0.5;
+    map = map - 0.5; %normalizes map to represent area under curve, over chance
     F = griddedInterpolant(time,map);
     fun = @(t) F(t);
     res_integral = integral(fun, time(1), time(end));

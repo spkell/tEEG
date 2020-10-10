@@ -39,7 +39,7 @@ for subject=1:nsubjects
     class_raw_mat(subject,:) = sample_map;
 end  
 
-figure; %New figure for individual and average plots
+figure; %New figure
 
 %Plot each subject's classification accuracy on superposition plot
 subplot(2,1,1);
