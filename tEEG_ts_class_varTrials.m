@@ -63,7 +63,6 @@ for eeg_type=1:2 %tEEG and eEEG
     
     %store area under curve for each number of trials
     roc_eegs(eeg_type,:) = roc;
-    
 end
 
 figure; %figure to display roc of both eeg types
