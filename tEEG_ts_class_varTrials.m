@@ -7,7 +7,7 @@
 % decreases from 100->3. The area under the curve represents the 
 % integral of classification of above chance large vs small stimuli.
 %
-%Runtime: 2eeg_types * (100trials * 12seconds * 10subjects) / 2 = ~3.3hrs
+%Runtime: 2eeg_types * 10subjects * (100trials * 12seconds)/2 = ~3.3hrs
 %
 % * targets: large vs. small checker stimuli
 % * chunks: program assumes that every trial is independent
