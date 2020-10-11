@@ -25,11 +25,14 @@
 
 %Classifier conditions
 fix_pos = 1;
-%ntrials = 100; %all trials
-ntrials = 10; %Debug with small number of trials
+ntrials = 100; %all trials
+%ntrials = 15; %DEBUG: small number of trials
 
 % reset citation list
 cosmo_check_external('-tic');
+
+%retrieve participant conditions
+conditions = tEEG_conditions();
 
 time_values = (1:494); % first dim (channels got nuked)
 nsubjects = 10; %all subjects
@@ -105,8 +108,6 @@ for eeg_type=1:2
     end
 end
 
-%retrieve participant conditions
-conditions = tEEG_conditions();
 %Plot each subject's tEEG vs eEEG ROC curve separately
 figure;
 for subject=1:nsubjects
@@ -127,4 +128,6 @@ for subject=1:nsubjects
     hline(0,'k','chance');
     hold off
 end
+
+figure_title = strcat('Fixation Position: ', conditions{2}{fix_pos});
 MarkPlot('Fix_pos:center');
