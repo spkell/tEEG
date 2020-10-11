@@ -1,11 +1,14 @@
 %Author: Sean Kelly
-%Filename: tEEG_ts_class_varTrials.m
-%Date: 10/10/20
+%Filename: tEEG_ts_class_varTrials_v1.m
+%Date: 10/11/20
 %
 %Purpose: This classifier performs MVPA analyses on tEEG and eEEG data,
 % and plots area under curve of tEEG and eEEG classification as ntrials
 % decreases from 100->3. The area under the curve represents the 
 % integral of classification of above chance large vs small stimuli.
+%
+%Update from V1: pulls out structure of each subject's classification
+% scores for every trial type, and completes ROC analysis afterward.
 %
 %Runtime: 2eeg_types * 10subjects * (100trials * 12seconds)/2 = ~3.3hrs
 %
@@ -59,8 +62,8 @@ for eeg_type=1:2 %tEEG and eEEG
         end
         
         %Average classification accuracy across all subjects for each timepoint
-        class_avg = mean(class_raw_mat,1); %1 x 494cl-performance
-        roc(eeg_type,trial_count) = integral_sl_map(time_values,class_avg);
+        %class_avg = mean(class_raw_mat,1); %1 x 494cl-performance
+        %roc(eeg_type,trial_count) = integral_sl_map(time_values,class_avg)
         
     end
 end
