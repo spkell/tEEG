@@ -1,3 +1,4 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Author: Sean Kelly
 %Filename: tEEG_ts_class_backend.m
 %Date: 10/10/20
@@ -16,6 +17,10 @@
 %
 %Example: tEEG_ts_class_backend(1,1,1,50)
 %         => Subject 1, Center fixation, tEEG, 50 trials
+%
+%TODO: 1. use different target inputs for classification
+%      2. randomize which trials are selected with ntrials
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function sample = tEEG_ts_class_backend(subject, fix_pos, eeg_type, ntrials)
 

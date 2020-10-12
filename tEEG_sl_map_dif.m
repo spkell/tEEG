@@ -1,3 +1,4 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Author: Sean Kelly
 %Filename: tEEG_sl_map_dif.m
 %Date: 10/5/20
@@ -5,6 +6,7 @@
 % This programcalculates and plots the difference in classification
 % accuracy between any given searchlight outputs of 
 % tEEG_timeseries_classification_v2() (i.e. tEEG, eEEG output)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function dif_map = tEEG_sl_map_dif(map_1, map_2)
     

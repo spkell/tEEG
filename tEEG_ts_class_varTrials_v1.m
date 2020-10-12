@@ -21,12 +21,14 @@
 %Dependencies: FieldTrip, CosmoMVPA
 %
 %Example: tEEG_ts_class_varTrials
+%
+%TODO: take steps between trials instead of classifying for every 3:ntrials
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Classifier conditions
 fix_pos = 1;
-ntrials = 100; %all trials
-%ntrials = 15; %DEBUG: small number of trials
+%ntrials = 100; %all trials
+ntrials = 15; %DEBUG: small number of trials
 
 % reset citation list
 cosmo_check_external('-tic');
@@ -70,7 +72,8 @@ class_avg = mean(ts_class_mat,1); %1 x 494cl-performance x 98trials x 2eegs
 class_avg = squeeze(class_avg); %494cl-performance x 98trials x 2eegs
 
 %Preallocate memory to store roc for both tEEG and eEEG
-roc(1:2,ntrials-2) = zeros(); %2eeg_types * 98trials
+roc_zeros(1:2,ntrials-2) = zeros(); %2eeg_types * 98trials
+roc = roc_zeros; %resets size in case of larger roc matrix loaded
 
 %calculate integral of each average classification vector
 for eeg_type=1:2 %tEEG and eEEG
@@ -99,7 +102,8 @@ MarkPlot('Fix_pos:center');
 hline(0,'k','chance');
 
 %calculate integral of each subject's classification vector
-roc_indiv(1:nsubjects,1:2,ntrials-2) = zeros(); %10subjects * 2eeg_types * 98trials
+roc_indiv_zeros(1:nsubjects,1:2,ntrials-2) = zeros(); %10subjects * 2eeg_types * 98trials
+roc_indiv = roc_indiv_zeros;
 for eeg_type=1:2
     for subject=1:nsubjects
         for trial_count=1:ntrials-2

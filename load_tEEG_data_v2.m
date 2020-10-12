@@ -1,3 +1,4 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Author: Sean Kelly & Pr. Mruczek
 %Filename: load_tEEG_data_v2.m
 %Date: 10/8/20
@@ -8,6 +9,7 @@
 % data pertaining to given params
 %
 %Example: load_tEEG_data_v2('0341', 'UpperRight', 'large')
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function data = load_tEEG_data_v2(subject, fixation_pos, stim)
 
