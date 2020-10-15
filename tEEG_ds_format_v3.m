@@ -6,13 +6,15 @@
 %Purpose: Create tEEG dataset structure to use as sample by feature dataset
 % for use in CosmoMVPA classifier analysis.
 %
-% This dataset is specifically structured to examine (e/t)EEG classifier
-% performance for one given fixation point to differentiate between
-% large and small checker stimuli.
+% This dataset is structured to examine (e/t)EEG classifier performance
+% for one given fixation point to differentiate between
+% large and small checker stimuli targets.
 %
 % Function takes integer params of subject, fix_pos, and EEG_type, which
 % will be extracted from tEEG_conditions(). The additional input is the
 % number of trials that wil be considered for each sample.
+%
+%Targets: Large vs Small stimuli
 %
 %Example: tEEG_ds_format_v1(1,1,1,50)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
