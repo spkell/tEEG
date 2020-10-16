@@ -87,7 +87,7 @@ for eeg_type=1:2 %tEEG and eEEG
     end
 end
 
-figure; %figure to display roc of both eeg types
+f(1) = figure; %figure to display roc of both eeg types
 
 %Plot average receiving operator characteristic curve for tEEG and eEEG
 for eeg_type=1:2
@@ -118,7 +118,7 @@ for eeg_type=1:2
 end
 
 %Plot each subject's tEEG vs eEEG ROC curve separately
-figure;
+f(2) = figure;
 for subject=1:nsubjects
     subplot(ceil(nsubjects/2),2,subject);
     for eeg_type=1:2

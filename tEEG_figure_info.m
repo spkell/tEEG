@@ -22,7 +22,7 @@ function fig_title = tEEG_figure_info(subject, fix_pos, eeg_type, stim_size, ntr
             targs = {conds{4}{stim_size(1)}, conds{4}{stim_size(2)}};
             params = conds{2}{fix_pos};
         end
-        fig_title = strcat("Targets: ",targs{1},", ",targs{2}," / Conditions: ",params);
+        fig_title = strcat("Targets_",targs{1},"+",targs{2},"_Conditions_",params);
 
     elseif subject == 0 %plot contains >2 participants // tEEG_timeseries_classification_v3.m
         if length(fix_pos) == 2
@@ -35,7 +35,7 @@ function fig_title = tEEG_figure_info(subject, fix_pos, eeg_type, stim_size, ntr
             targs = {conds{4}{stim_size(1)}, conds{4}{stim_size(2)}};
             params = {conds{2}{fix_pos}, conds{3}{eeg_type}};
         end
-        fig_title = strcat("Targets: ",targs{1},", ",targs{2}," / Conditions: ",params{1},", ",params{2},", ",string(ntrials)," Trials");
+        fig_title = strcat("Targets_",targs{1},"+",targs{2},"_Conditions_",params{1},"+",params{2},"+",string(ntrials),"Trials");
     
     end
 end

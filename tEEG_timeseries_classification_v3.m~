@@ -20,7 +20,7 @@
 fix_pos = [2,5];
 eeg_type = 1;
 stim_size = 1;
-ntrials = 75;
+ntrials = 10;
 
 
 % reset citation list
@@ -79,5 +79,5 @@ fig_title = tEEG_figure_info(0, fix_pos, eeg_type, stim_size, ntrials);
 MarkPlot(fig_title);
 
 %Save figure
-file_name = strcat('ts_class_outputs/tEEG_timeseries_class_v3/autosave/',fig_title,'.fig');
+file_name = strcat(ts_class_outputs,fig_title,'.fig');
 savefig(f,file_name)
