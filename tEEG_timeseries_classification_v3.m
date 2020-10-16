@@ -17,10 +17,10 @@
 %Example: tEEG_timeseries_classification_v3
 
 %Classifier conditions
-fix_pos = [2,5];
-eeg_type = 1;
+fix_pos = 1;
+eeg_type = [1,2];
 stim_size = 1;
-ntrials = 75;
+ntrials = 100;
 
 
 % reset citation list
