@@ -25,23 +25,27 @@
 %TODO: take steps between trials instead of classifying for every 3:ntrials
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%Classifier conditions
-fix_pos = 1;
-%ntrials = 100; %all trials
-ntrials = 15; %DEBUG: small number of trials
-
 % reset citation list
 cosmo_check_external('-tic');
+
+%Classifier conditions
+
+nsubjects = 10; %all subjects
+%nsubjects = 1; %DEBUG: only 1 subject to reduce time complexity by 10x
+
+fix_pos = 1;
+stim_size = [1,2];
+
+%ntrials = 100; %all trials
+ntrials = 15; %DEBUG: small number of trials
 
 %retrieve participant conditions
 conditions = tEEG_conditions();
 
 time_values = (1:494); % first dim (channels got nuked)
-nsubjects = 10; %all subjects
-%nsubjects = 1; %DEBUG: only 1 subject to reduce time complexity by 10x
 
 %Preallocate memory of matrix to store all classification scores generated
-ts_class_mat(1:nsubjects,size(time_values,2),ntrials-2,2) = zeros(); %10subjects x 494ms x 98trials x 2eegs
+ts_class_mat(1:nsubjects,size(time_values,2),ntrials-2,2) = zeros(); %10subjects x 494ms x 98trial_sizes x 2eegs
 
 %Extract classifier scored for each trial combination
 for eeg_type=1:2 %tEEG and eEEG
@@ -52,7 +56,7 @@ for eeg_type=1:2 %tEEG and eEEG
         for subject=1:nsubjects
 
             %runs ts classification
-            sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type, trial_count+2); %1subject x 494(classifier performance)
+            sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type, stim_size, trial_count+2); %1subject x 494(classifier performance)
             %trial_count+2 since 1,2 trials aren't accepted by classifier
             
             ts_class_mat(subject,:,trial_count,eeg_type) = sample_map; %10subjects x 494cl-performance x 98trials x 2eegs
@@ -98,7 +102,8 @@ ylabel('Area Under Curve (Class Accuracy * ms)');
 xlabel('Trials Used to Train Classifier');
 title('Average ROC Curve: tEEG vs eEEG');
 legend('tEEG','eEEG');
-MarkPlot('Fix_pos:center');
+figure_title = tEEG_figure_info(0,fix_pos,0,stim_size,0);
+MarkPlot(figure_title);
 hline(0,'k','chance');
 
 %calculate integral of each subject's classification vector
@@ -133,5 +138,5 @@ for subject=1:nsubjects
     hold off
 end
 
-figure_title = strcat('Fixation Position: ', conditions{2}{fix_pos});
-MarkPlot('Fix_pos:center');
+figure_title = tEEG_figure_info(0,fix_pos,0,stim_size,0);
+MarkPlot(figure_title);

@@ -31,7 +31,7 @@ function ds = tEEG_ds_format_v4(subject, fixation_pos, eeg_type, stim_size, ntri
         
     elseif length(fixation_pos) == 2 %fixation_pos targets
         subject_param = {conditions{1}{subject}, conditions{1}{subject}};
-        fix_pos_param = {conditions{2}{fixation_pos(1)}, conditions{2}{fixation_pos(1)}};
+        fix_pos_param = {conditions{2}{fixation_pos(1)}, conditions{2}{fixation_pos(2)}};
         stim_param = {conditions{4}{stim_size}, conditions{4}{stim_size}};
         targs = fix_pos_param;
         
@@ -103,8 +103,12 @@ function ds = tEEG_ds_format_v4(subject, fixation_pos, eeg_type, stim_size, ntri
    ds.a.fdim.values = values;
    
    %constructs sample attributes of dataset
-   labels_targ1 = repmat(targs{1}, ntrials,1);
-   labels_targ2 = repmat(targs{2}, ntrials,1);
+   labels_targ1 = repmat({targs{1}}, ntrials,1);
+   labels_targ2 = repmat({targs{2}}, ntrials,1);
+   
+   size(labels_targ1)
+   size(labels_targ2)
+   
    labels = [labels_targ1; labels_targ2];
    ds.sa.labels = labels;
    

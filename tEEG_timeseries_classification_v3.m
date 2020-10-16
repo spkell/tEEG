@@ -7,7 +7,7 @@
 % another plot containing the average classification performance for each
 % time point.
 %
-% * targets: large vs. small checker stimuli
+% * targets: 2 subjects XOR fix_pos XOR eeg_type XOR stim_size
 % * chunks: program assumes that every trial is independent
 % * trials: each trial is the summation of a given index from each
 %   of the 494 epochs
@@ -17,9 +17,11 @@
 %Example: tEEG_timeseries_classification_v3
 
 %Classifier conditions
-fix_pos = 1;
+fix_pos = [2,5];
 eeg_type = 1;
+stim_size = 1;
 ntrials = 10;
+
 
 % reset citation list
 cosmo_check_external('-tic');
@@ -34,7 +36,7 @@ class_raw_mat(:,size(time_values,2)) = zeros(nsubjects,1);
 for subject=1:nsubjects
 
     %runs ts classification
-    sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type, ntrials);
+    sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type, stim_size, ntrials);
     
     class_raw_mat(subject,:) = sample_map;
 end  
@@ -71,3 +73,7 @@ ylabel('classification accuracy (chance=.5)');
 xlabel('time (ms)');
 postfix='Average Classification Accuracy - All Participants';
 title(postfix);
+
+%Label plot with relevent information
+fig_title = tEEG_figure_info(0, fix_pos, eeg_type, stim_size, ntrials);
+MarkPlot(fig_title);
