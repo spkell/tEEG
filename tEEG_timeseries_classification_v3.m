@@ -21,8 +21,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Classifier conditions
-fix_pos = [2,5];
-eeg_type = [1,2];
+fix_pos = 1;
+eeg_type = [1:2];
 stim_size = 1;
 ntrials = 50;
 
@@ -31,7 +31,8 @@ ntrials = 50;
 cosmo_check_external('-tic');
 
 time_values = (1:494); % first dim (channels got nuked)
-nsubjects = 10; %all subjects
+%nsubjects = 10; %all subjects
+nsubjects = 1;
 
 %Preallocate memory to store classification of each subject
 class_raw_mat(:,size(time_values,2)) = zeros(nsubjects,1);

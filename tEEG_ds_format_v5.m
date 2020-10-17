@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Author: Sean Kelly
-%Filename: tEEG_ds_format_v4.m
+%Filename: tEEG_ds_format_v5.m
 %Date: 10/15/20
 %
 %Purpose: Create tEEG dataset structure to use as sample by feature dataset
@@ -14,7 +14,7 @@
 % additional input is the number of trials that wil be considered for each
 % sample.
 %
-%Example: tEEG_ds_format_v4(1, [2,5], 1, 1, 50)
+%Example: tEEG_ds_format_v5(1, [2,5], [1,2], 1, 50)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntrials)
@@ -89,7 +89,11 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
                     targ = targ + 1;
                 else
                     for eeg=1:len_eeg_type 
-                        ds_targs{targ} = temp_ds_targs.data(1:6,:,1:ntrials); %TODO: take random mix of trials instead
+                        if eeg == 1
+                            ds_targs{targ} = temp_ds_targs.data(1:6,:,1:ntrials); %TODO: take random mix of trials instead
+                        elseif eeg == 2
+                            ds_targs{targ} = temp_ds_targs.data(7:12,:,1:ntrials); %TODO: take random mix of trials instead
+                        end
                         targ_labels{targ} = strcat(conditions{3}{eeg},'_',subject_param{subj},'_',stim_param{stim},'_',fix_pos_param{pos});
                         targ = targ + 1;
                     end %6 chans x 494 timepoints x n_trials
@@ -97,6 +101,8 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
             end
         end
     end
+    
+        
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

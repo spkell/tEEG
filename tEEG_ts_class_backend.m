@@ -59,7 +59,7 @@ function sample = tEEG_ts_class_backend(subject, fix_pos, eeg_type, stim_size, n
     % Alternative are @cosmo_classify_{svm,nn,lda}.
     measure=@cosmo_crossvalidation_measure;
     measure_args=struct();
-    measure_args.classifier=@cosmo_classify_naive_bayes; % RM: consider other classifiers, such as SVM or nearest neighbor
+    measure_args.classifier=@cosmo_classify_lda; %classify_naive_bayes; %lda similar to svm with better performance
     measure_args.partitions=partitions;
 
     ds_tl_sel = ds_tl; % RM: use all channels, no real selection here.  just keeping variable name consistent with tutorial code, below

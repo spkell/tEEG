@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Author: Sean Kelly
-%Filename: tEEG_ds_format_v4.m
+%Filename: tEEG_ds_format_v5.m
 %Date: 10/15/20
 %
 %Purpose: Create tEEG dataset structure to use as sample by feature dataset
@@ -14,7 +14,7 @@
 % additional input is the number of trials that wil be considered for each
 % sample.
 %
-%Example: tEEG_ds_format_v4(1, [2,5], 1, 1, 50)
+%Example: tEEG_ds_format_v5(1, [2,5], [1,2], 1, 50)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntrials)
@@ -40,7 +40,6 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
         ntarget_combinations = ntarget_combinations * len_eeg_type;
     end
     if len_stim_size > 1
-        ntargets = ntargets + len_stim_size;
         ntarget_combinations = ntarget_combinations * len_stim_size;
     end
     
@@ -98,6 +97,9 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
             end
         end
     end
+    
+    if ntarget_combinations == len_eeg_type
+        
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
