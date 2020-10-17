@@ -1,3 +1,4 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Author: Sean Kelly
 %Filename: tEEG_timeseries_classification_v3.m
 %Date: 10/8/20
@@ -16,11 +17,14 @@
 %
 %Example: tEEG_timeseries_classification_v3
 
+%TODO: mark plot with accurate labels including each target combination
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %Classifier conditions
-fix_pos = 1;
+fix_pos = [2,5];
 eeg_type = [1,2];
 stim_size = 1;
-ntrials = 100;
+ntrials = 50;
 
 
 % reset citation list
@@ -32,7 +36,7 @@ nsubjects = 10; %all subjects
 %Preallocate memory to store classification of each subject
 class_raw_mat(:,size(time_values,2)) = zeros(nsubjects,1);
 
-%Runs timeseries classification for eacvh subject
+%Runs timeseries classification for each subject
 for subject=1:nsubjects
 
     %runs ts classification

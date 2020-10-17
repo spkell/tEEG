@@ -24,26 +24,36 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
     
     %number of inputs for each parameter
     len_subject = length(subject);
-    len_fix_pos = length(fix_pos);
+    len_fix_pos = length(fixation_pos);
+    len_eeg_type = length(eeg_type);
     len_stim_size = length(stim_size);
     
-    ntargets = 0;
+    ntarget_combinations = 1; %identify number of combinations of targets
+    
     if len_subject > 1
-        ntargets = ntargets + len_subject;
+        ntarget_combinations = ntarget_combinations * len_subject;
     end
     if len_fix_pos > 1
-        ntargets = ntargets + len_fix_pos;
+        ntarget_combinations = ntarget_combinations * len_fix_pos;
+    end
+    if len_eeg_type > 1
+        ntarget_combinations = ntarget_combinations * len_eeg_type;
     end
     if len_stim_size > 1
-        ntargets = ntargets + len_stim_size;
+        ntarget_combinations = ntarget_combinations * len_stim_size;
     end
     
-    %set of target params
-    targs = cell(ntargets,1);
+    %{
+    target combinations ex:
+     1a 1b 2a 2b 3a 3b
+     1a2a3a 1a2a3b 1a2b3a 1a2b3b 1b2a3a 1b2a3b 1b2b3a 1b2b3b
     
-    %parameters to load datasets.
+    1a 1b 1c 2a 2b
+    1a2a 1a2b 1b2a 1b2b 1c2a 1c2b
+    %}
+    
+    %identify parameters to load datasets.
     %if length(param) > 1, the parameter is a target for the classifier
-    
     subject_param = cell(len_subject,1);
     for subj=1:len_subject
         subject_param{subj} = conditions{1}{subject(subj)};
@@ -51,51 +61,66 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
     
     fix_pos_param = cell(len_fix_pos,1);
     for pos=1:len_fix_pos
-        fix_pos_param{pos} = conditions{2}{subject(pos)};
+        fix_pos_param{pos} = conditions{2}{fixation_pos(pos)};
     end
     
     stim_param = cell(len_stim_size,1);
     for stim=1:len_stim_size
-        stim_param{stim} = conditions{1}{stim_size(stim)};
+        stim_param{stim} = conditions{4}{stim_size(stim)};
     end
     
+    targ_labels = cell(ntarget_combinations,1);%identify labels for each target condition
     
-    ds_targ1 = load_tEEG_data_v2(subject_param{1}, fix_pos_param{1}, stim_param{1}); %Load data files for both stimuli
-    ds_targ2 = load_tEEG_data_v2(subject_param{2}, fix_pos_param{2}, stim_param{2}); %12 chans x 494 timepoints x ~100 trials
+    ds_targs = cell(ntarget_combinations,1); %set of target datasets
     
-    %Select tEEG for channels 1-6, and eEEG for channels 7-12
-    %Results in 6 chans x 494 timepoints x n_trials for both ds_targs
-    if length(eeg_type) == 2 %eeg_type targets
-        ds_targ1 = ds_targ1.data(1:6,:,1:ntrials); %TODO: take random mix of trials instead
-        ds_targ2 = ds_targ2.data(7:12,:,1:ntrials);
-    else
-        if eeg_type == 1 %input is tEEG
-            ds_targ1 = ds_targ1.data(1:6,:,1:ntrials); %TODO: take random mix of trials instead
-            ds_targ2 = ds_targ2.data(1:6,:,1:ntrials);
-        else %input is eEEG
-            ds_targ1 = ds_targ1.data(7:12,:,1:ntrials);
-            ds_targ2 = ds_targ2.data(7:12,:,1:ntrials);
+    %load dataset for each target condition
+    targ = 1;
+    for subj=1:len_subject
+        for pos=1:len_fix_pos
+            for stim=1:len_stim_size
+                temp_ds_targs = load_tEEG_data_v2(subject_param{subj}, fix_pos_param{pos}, stim_param{stim}); %12 chans x 494 timepoints x ~100 trials
+                if len_eeg_type == 1
+                    if eeg_type == 1 %input is tEEG
+                        ds_targs{targ} = temp_ds_targs.data(1:6,:,1:ntrials); %TODO: take random mix of trials instead
+                    else %input is eEEG
+                        ds_targs{targ} = temp_ds_targs.data(7:12,:,1:ntrials);
+                    end
+                    targ_labels{targ} = strcat(conditions{3}{eeg_type},'_',subject_param{subj},'_',stim_param{stim},'_',fix_pos_param{pos});
+                    targ = targ + 1;
+                else
+                    for eeg=1:len_eeg_type 
+                        ds_targs{targ} = temp_ds_targs.data(1:6,:,1:ntrials); %TODO: take random mix of trials instead
+                        targ_labels{targ} = strcat(conditions{3}{eeg},'_',subject_param{subj},'_',stim_param{stim},'_',fix_pos_param{pos});
+                        targ = targ + 1;
+                    end %6 chans x 494 timepoints x n_trials
+                end
+            end
         end
     end
-   
-   nchans = size(ds_targ1,1); % RM: this is somewhat hardcoded, as it depends on the above selection code.  but should be ok because it should never change
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+   nchans = size(ds_targs{1},1); % RM: this is somewhat hardcoded, as it depends on the above selection code.  but should be ok because it should never change
 
    %Extract number of time points and trials for each stimuli
-   ntimepoints = size(ds_targ1,2); %should be same for both targ1 and targ2
+   ntimepoints = size(ds_targs{1},2); %same for all targets
    
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-   %reshape dataset
-   ds_targ1 = squeeze(reshape (ds_targ1, [], 1, ntrials));
-   ds_targ2 = squeeze(reshape (ds_targ2, [], 1, ntrials));
-   ds_targ1 = ds_targ1'; %ntrials X (nchans*ntimepoints)
-   ds_targ2 = ds_targ2';
+   %reshape dataset for each target combination
+   for combo=1:ntarget_combinations
+       ds_targs{combo} = squeeze(reshape (ds_targs{combo}, [], 1, ntrials));
+       ds_targs{combo} = ds_targs{combo}'; %ntrials X (nchans*ntimepoints)
+   end
    
-   %initializes samples as large and small data concatenated
-   ds.samples = [ds_targ1;ds_targ2]; %DEBUG: in type single, should be of type double? RM: the range of values is likely ok with single precision, and it will be easier on memory.  but can use double to be cautious (or come back and test out later)
+   %initializes samples as concatenated target datasets
+   temp_sample = ds_targs{1};
+   for combo=2:ntarget_combinations
+       temp_sample = [temp_sample;ds_targs{combo}]; %how to preallocate this or stack ds from each cell?
+   end
+
+   ds.samples = temp_sample; %DEBUG: in type single, should be of type double? RM: the range of values is likely ok with single precision, and it will be easier on memory.  but can use double to be cautious (or come back and test out later)
    
-   %constructs feature attributes of dataset          % RM: may want to construct these in the full 3D matrix space, to be sure order is correct
-   ds.fa.chan = repmat((1:nchans), [1 ntimepoints]);  % RM: pull the 494 from the data loaded initially so not hardcoded
+   %constructs feature attributes of dataset
+   ds.fa.chan = repmat((1:nchans), [1 ntimepoints]);  
    ds.fa.time = repelem((1:ntimepoints), nchans);
    
    %constructs attributes of dataset
@@ -112,29 +137,44 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
    ds.a.fdim.values = values;
    
    %constructs sample attributes of dataset
-   labels_targ1 = repmat({targs{1}}, ntrials,1);
-   labels_targ2 = repmat({targs{2}}, ntrials,1);
+   label_list = cell(ntarget_combinations,1);
+   for combo=1:ntarget_combinations
+       label_list{combo} = repmat({targ_labels{combo}},ntrials,1); %{A{i}} == A(i) matlab automatic suggestion?
+   end 
    
-   size(labels_targ1)
-   size(labels_targ2)
-   
-   labels = [labels_targ1; labels_targ2];
-   ds.sa.labels = labels;
+   temp_labels = label_list{1};
+   for combo=2:ntarget_combinations
+       temp_labels = [temp_labels; label_list{combo}]; %how to preallocate this or stack ds from each cell?
+   end
+
+   ds.sa.labels = temp_labels;
    
    %each component of each epoch is an independent chunk
-   chunks = (1:(2 * ntrials));
+   chunks = (1:(ntarget_combinations * ntrials));
    ds.sa.chunks = chunks';
    
-   %repeats target code (1,2) for the amount of trials in the sample and
+   %repeats target codes for the amount of trials in the sample and
    %concatenates them
-   targets_1 = repelem(1,ntrials);
-   targets_2 = repelem(2,ntrials);
-   targets_1 = targets_1';
-   targets_2 = targets_2';
-   targets = [targets_1; targets_2];
-   ds.sa.targets = targets;
+   targets = zeros(ntarget_combinations,ntrials);
+   for combo=1:ntarget_combinations
+       targets(combo,:) = combo;
+   end
+   targets = targets';
    
-   ds.sa.trialinfo(:,1) = targets;
-   ds.sa.trialinfo(:,2) = [(1:ntrials)'; (1:ntrials)'];
+   target_stack = targets(:,1);
+   for combo=2:ntarget_combinations
+       target_stack = [target_stack; targets(:,combo)]; %how to preallocate this or stack ds from each matrix?
+   end
+   
+   ds.sa.targets = target_stack;
+   
+   ds.sa.trialinfo(:,1) = target_stack;
+   
+   trial_info = (1:ntrials)';
+   for combo=2:ntarget_combinations
+       trial_info = [trial_info; (1:ntrials)']; %how to preallocate this or stack ds from each array?
+   end
+   
+   ds.sa.trialinfo(:,2) = trial_info;
    
 end

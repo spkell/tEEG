@@ -24,7 +24,7 @@ function sample = tEEG_ts_class_backend(subject, fix_pos, eeg_type, stim_size, n
 
     %load formatted dataset
     %Params = subject(1:10), fixation_position(1:7), (t/e)EEG(1:2), stim_size(1:2), ntrials(3:100)
-    ds_tl = tEEG_ds_format_v4(subject, fix_pos, eeg_type, stim_size, ntrials);
+    ds_tl = tEEG_ds_format_v5(subject, fix_pos, eeg_type, stim_size, ntrials);
 
     % just to check everything is ok
     cosmo_check_dataset(ds_tl);
