@@ -22,7 +22,7 @@
 
 %Classifier conditions
 fix_pos = 1;
-eeg_type = [1:2];
+eeg_type = (1:2);
 stim_size = 1;
 ntrials = 50;
 
