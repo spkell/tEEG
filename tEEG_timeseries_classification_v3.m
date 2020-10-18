@@ -31,11 +31,10 @@ ntrials = 50;
 cosmo_check_external('-tic');
 
 time_values = (1:494); % first dim (channels got nuked)
-%nsubjects = 10; %all subjects
-nsubjects = 1;
+nsubjects = 10; %all subjects
 
 %Preallocate memory to store classification of each subject
-class_raw_mat(:,size(time_values,2)) = zeros(nsubjects,1);
+class_raw_mat(nsubjects,size(time_values,2)) = zeros();
 
 %Runs timeseries classification for each subject
 for subject=1:nsubjects
