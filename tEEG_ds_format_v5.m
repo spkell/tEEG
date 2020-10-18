@@ -19,7 +19,7 @@
 
 function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntrials)
     
-    %load string representations of trial parameters
+    %load string representations of trial parameters in conditions struct
     conditions = tEEG_conditions();
     
     %number of inputs for each parameter
@@ -40,9 +40,9 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
     %}
     
     %identify parameters to load datasets.
-    subject_param = conditions{1}(subject)'; 
-    fix_pos_param = conditions{2}(fixation_pos)';
-    stim_param = conditions{4}(stim_size);
+    subject_param = conditions.subject(subject)'; 
+    fix_pos_param = conditions.fix_pos(fixation_pos)';
+    stim_param = conditions.stim(stim_size);
     
     targ_labels = cell(ntarget_combinations,1);%identify labels for each target condition
     ds_targs = cell(ntarget_combinations,1); %set of target datasets
@@ -62,7 +62,7 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
                         otherwise
                             error('invalid eeg_type (%d) requested',eeg_type(eeg))
                     end
-                    targ_labels{targ} = strcat(conditions{3}{eeg},'_',subject_param{subj},'_',stim_param{stim},'_',fix_pos_param{pos});
+                    targ_labels{targ} = strcat(conditions.EEG_type{eeg},'_',subject_param{subj},'_',stim_param{stim},'_',fix_pos_param{pos});
                     targ = targ + 1;
                 end %6 chans x 494 timepoints x n_trials
             end
@@ -97,7 +97,7 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
    ds.a.eeg.samples_field = 'trial';
    
    %a.fdim.values
-   channels = conditions{5};
+   channels = conditions.channel;
    values = {channels, 0:ntimepoints-1}; % RM: I need to check to see if first time point represents time zero (synchronous with stimulus onset), in which case this might be (1:ntimepoints)-1 to represent time in ms
    values = values';
    ds.a.fdim.values = values;

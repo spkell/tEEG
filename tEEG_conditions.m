@@ -9,20 +9,20 @@
 
 function conds = tEEG_conditions()
 
-    subject = {'0341','0976','1419','2630','2785','5469',... %ellipsis
-        '6541','6892','8003','9133'};
+    conds = struct();
     
-    fixation_pos = {'Center','LeftCenter','LowerLeft',...
+    conds.subject = {'0341','0976','1419','2630','2785',... %ellipsis
+        '5469','6541','6892','8003','9133'};
+    
+    conds.fix_pos = {'Center','LeftCenter','LowerLeft',...
         'LowerRight','RightCenter','UpperLeft','UpperRight'};
     
-    EEG_type = {'tEEG','eEEG'};
+    conds.EEG_type = {'tEEG','eEEG'};
     
-    stimuli = {'large','small'};
+    conds.stim = {'large','small'};
     
-    channel = {'O1', 'Oz', 'O2', 'P3', 'Pz', 'P4'};
+    conds.channel = {'O1', 'Oz', 'O2', 'P3', 'Pz', 'P4'};
 
-    %Returns structure containing every condition
-    conds = {subject, fixation_pos, EEG_type, stimuli, channel};
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

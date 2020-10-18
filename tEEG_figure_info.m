@@ -16,24 +16,24 @@ function fig_title = tEEG_figure_info(subject, fix_pos, eeg_type, stim_size, ntr
     
     if subject == 0 && ntrials == 0 && eeg_type == 0 %tEEG_ts_class_varTrials_v1.m
         if length(fix_pos) == 2
-            targs = {conds{2}{fix_pos(1)}, conds{2}{fix_pos(2)}};
-            params = conds{4}{stim_size};
+            targs = {conds.fix_pos{fix_pos(1)}, conds.fix_pos{fix_pos(2)}};
+            params = conds.stim{stim_size};
         elseif length(stim_size) == 2
-            targs = {conds{4}{stim_size(1)}, conds{4}{stim_size(2)}};
-            params = conds{2}{fix_pos};
+            targs = {conds.stim{stim_size(1)}, conds.stim{stim_size(2)}};
+            params = conds.fix_pos{fix_pos};
         end
         fig_title = strcat("Targets_",targs{1},"+",targs{2},"_Conditions_",params);
 
     elseif subject == 0 %plot contains >2 participants // tEEG_timeseries_classification_v3.m
         if length(fix_pos) == 2
-            targs = {conds{2}{fix_pos(1)}, conds{2}{fix_pos(2)}};
-            params = {conds{3}{eeg_type}, conds{4}{stim_size}};
+            targs = {conds.fix_pos{fix_pos(1)}, conds.fix_pos{fix_pos(2)}};
+            params = {conds.EEG_type{eeg_type}, conds.stim{stim_size}};
         elseif length(eeg_type) == 2
-            targs = {conds{3}{eeg_type(1)}, conds{3}{eeg_type(2)}};
-            params = {conds{2}{fix_pos}, conds{4}{stim_size}};
+            targs = {conds.EEG_type{eeg_type(1)}, conds.EEG_type{eeg_type(2)}};
+            params = {conds.fix_pos{fix_pos}, conds.stim{stim_size}};
         elseif length(stim_size) == 2
-            targs = {conds{4}{stim_size(1)}, conds{4}{stim_size(2)}};
-            params = {conds{2}{fix_pos}, conds{3}{eeg_type}};
+            targs = {conds.stim{stim_size(1)}, conds.stim{stim_size(2)}};
+            params = {conds.fix_pos{fix_pos}, conds.EEG_type{eeg_type}};
         end
         fig_title = strcat("Targets_",targs{1},"+",targs{2},"_Conditions_",params{1},"+",params{2},"+",string(ntrials),"Trials");
     

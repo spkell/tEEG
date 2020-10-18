@@ -131,7 +131,7 @@ for subject=1:nsubjects
     xlim([min(3),max(ntrials)]);
     ylabel('Classifier Integral'); %Class Accuracy * ms
     xlabel('Trials Used to Train Classifier');
-    title_string = strcat('ROC: tEEG vs eEEG // Subject: ', conditions{1}{subject});
+    title_string = strcat('ROC: tEEG vs eEEG // Subject: ', conditions.subject{subject});
     title(title_string);
     legend('tEEG','eEEG');
     hline(0,'k','chance');
