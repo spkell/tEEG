@@ -172,11 +172,11 @@ MarkPlot(figure_title);
 %Display surface plot of given eeg type in separate figures
 f(3) = figure;
 f(4) = figure;
-for eeg=1:size(class_avg,4)
+for eeg=1:size(class_avg,3)
     figure(2+eeg)
     eeg_sample = class_avg(:,:,eeg);
     eeg_sample = squeeze(eeg_sample);
-    surf(eeg_sample)
+    surf(eeg_sample) %TODO: change ntrials axes to go to 100 instead of nsteps
     xlabel('Trials Used to Train Classifier');
     ylabel('Timepoints (ms)');
     zlabel('classification accuracy');
@@ -185,5 +185,5 @@ for eeg=1:size(class_avg,4)
 end 
 
 %Save figures for each script run in one file
-file_name = strcat('ts_class_outputs/tEEG_ts_class_varTrials/autosave/',fig_title,'.fig');
+file_name = strcat('ts_class_outputs/tEEG_ts_class_varTrials/autosave/',figure_title,'.fig');
 savefig(f,file_name)
