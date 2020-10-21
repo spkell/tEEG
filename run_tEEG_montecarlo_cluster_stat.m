@@ -17,12 +17,14 @@
 
 %Dataset Parameters
 subject = 2;
-fixation_pos = 1;
+fix_pos = 1;
 eeg_type = 1;
 stim_size = [1,2];
 ntrials_request = 100;
 
-ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntrials_request);
+sample = tEEG_ts_class_backend(subject, fix_pos, eeg_type, stim_size, ntrials_request); %1class-score x 494timepoints
+
+ds = tEEG_ds_format_v5(subject, fix_pos, eeg_type, stim_size, ntrials_request);
 
 nbrhood = cosmo_cluster_neighborhood(ds);
 
@@ -52,6 +54,8 @@ for timepoint=1:length(z_scores_chans)
     end
 end
 
-figure;
 
-plot(z_scores);
+figure;
+plot(sample)
+hold on
+plot(z_scores)

@@ -18,7 +18,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntrials_request)
-    
+
     %load string representations of trial parameters in conditions struct
     conditions = tEEG_conditions();
     
@@ -54,7 +54,7 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
     for subj=1:len_subject
         for pos=1:len_fix_pos
             for stim=1:len_stim_size
-                temp_ds_targs = load_tEEG_data_v2(subject_param{subj}, fix_pos_param{pos}, stim_param{stim}); %12 chans x 494 timepoints x ~100 trials
+                temp_ds_targs = load_tEEG_data_v2(subject_param{subj}, stim_param{stim}, fix_pos_param{pos}); %12 chans x 494 timepoints x ~100 trials
                 for eeg=1:len_eeg_type % RM: this loop should work, even if len_eeg_type==1
                     rand_trials = randperm(size(temp_ds_targs.data,3)); %ideally ntrials_total // tEEG_1419_large_RightCenter.mat: ntrials = 76
                     rand_trials = rand_trials(1:ntrials_request);

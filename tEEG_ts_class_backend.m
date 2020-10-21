@@ -78,5 +78,5 @@ function sample = tEEG_ts_class_backend(subject, fix_pos, eeg_type, stim_size, n
     fprintf('The output has feature dimensions: %s\n', ...
         cosmo_strjoin(sl_map.a.fdim.labels,', '));
 
-    sample = sl_map.samples;
+    sample = sl_map.samples; %1class-score x 494timepoints
 end
