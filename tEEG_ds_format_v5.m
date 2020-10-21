@@ -17,7 +17,7 @@
 %Example: tEEG_ds_format_v5(1, [2,5], [1,2], 1, 50)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntrials)
+function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntrials_request)
     
     %load string representations of trial parameters in conditions struct
     conditions = tEEG_conditions();
@@ -27,6 +27,8 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
     len_fix_pos = length(fixation_pos);
     len_eeg_type = length(eeg_type);
     len_stim_size = length(stim_size);
+    
+    %ntrials_total = 100; %some participants have a couple more, 76 for 1419_large_RightCenter
     
     ntarget_combinations = length(subject) * length(fixation_pos) * length(eeg_type) * length(stim_size);
     
@@ -54,17 +56,19 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
             for stim=1:len_stim_size
                 temp_ds_targs = load_tEEG_data_v2(subject_param{subj}, fix_pos_param{pos}, stim_param{stim}); %12 chans x 494 timepoints x ~100 trials
                 for eeg=1:len_eeg_type % RM: this loop should work, even if len_eeg_type==1
+                    rand_trials = randperm(size(temp_ds_targs.data,3)); %ideally ntrials_total // tEEG_1419_large_RightCenter.mat: ntrials = 76
+                    rand_trials = rand_trials(1:ntrials_request);
                     switch eeg_type(eeg)
                         case 1 % eeg_type of 1 is tEEG
-                            ds_targs{targ} = temp_ds_targs.data(1:6,:,1:ntrials); %TODO: take random mix of trials instead
+                            ds_targs{targ} = temp_ds_targs.data(1:6,:,rand_trials);
                         case 2 % eeg_type of 2 is eEEG
-                            ds_targs{targ} = temp_ds_targs.data(7:12,:,1:ntrials); %TODO: take random mix of trials instead
+                            ds_targs{targ} = temp_ds_targs.data(7:12,:,rand_trials);
                         otherwise
                             error('invalid eeg_type (%d) requested',eeg_type(eeg))
                     end
                     targ_labels{targ} = strcat(conditions.EEG_type{eeg},'_',subject_param{subj},'_',stim_param{stim},'_',fix_pos_param{pos});
                     targ = targ + 1;
-                end %6 chans x 494 timepoints x n_trials
+                end %6 chans x 494 timepoints x n_trials_request
             end
         end
     end
@@ -78,8 +82,8 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
    
    %reshape dataset for each target combination
    for combo=1:ntarget_combinations
-       ds_targs{combo} = squeeze(reshape (ds_targs{combo}, [], 1, ntrials));
-       ds_targs{combo} = ds_targs{combo}'; %ntrials X (nchans*ntimepoints)
+       ds_targs{combo} = squeeze(reshape (ds_targs{combo}, [], 1, ntrials_request));
+       ds_targs{combo} = ds_targs{combo}'; %ntrials_request X (nchans*ntimepoints)
    end
    
    %combine multiple cell arrays into a single cell
@@ -103,22 +107,22 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
    ds.a.fdim.values = values;
    
    %constructs sample attributes of dataset
-   label_list = repmat(targ_labels',ntrials,1); % do the replication of all lists in one shot
+   label_list = repmat(targ_labels',ntrials_request,1); % do the replication of all lists in one shot
    label_list = label_list(:); % unpack into a single vector (columns get stacked)
    ds.sa.labels = label_list;
    
    %each component of each epoch is an independent chunk
-   chunks = (1:(ntarget_combinations * ntrials));
+   chunks = (1:(ntarget_combinations * ntrials_request));
    ds.sa.chunks = chunks';
    
    %repeats target codes for the amount of trials in the sample and concatenates them
-   targets = repmat(1:ntarget_combinations,[ntrials 1]); % same as your targets, above
+   targets = repmat(1:ntarget_combinations,[ntrials_request 1]); % same as your targets, above
    target_stack = targets(:); % this will convert a mXn matrix into an m*n X 1 vector, stacking each column
    
    ds.sa.targets = target_stack;
    ds.sa.trialinfo(:,1) = target_stack;
    
-   trial_info = repmat(1:ntrials,[ntarget_combinations 1])';
+   trial_info = repmat(1:ntrials_request,[ntarget_combinations 1])';
    trial_info = trial_info(:);
    
    ds.sa.trialinfo(:,2) = trial_info;

@@ -11,7 +11,7 @@
 %Example: load_tEEG_data_v2('0341', 'UpperRight', 'large')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function data = load_tEEG_data_v2(subject, fixation_pos, stim)
+function data = load_tEEG_data_v2(subject, stim, fixation_pos)
 
     %Sets path for tEEG data
     %Change depending on desired path
