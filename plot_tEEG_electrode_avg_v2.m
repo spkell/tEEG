@@ -7,7 +7,7 @@
 % electrode's average frequency over the course of 49.4 seconds
 %
 %                 subj2, large, center, all-tEEG-chans, set-axes
-%Example: plot_tEEG_electrode_avg(2,1,1,[1:6],1)
+%Example: plot_tEEG_electrode_avg_v2(2,1,1,[1:6],1)
 %
 %TODO: change directory path in load_tEEG_data()
 

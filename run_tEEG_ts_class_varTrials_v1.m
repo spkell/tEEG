@@ -36,7 +36,7 @@ nsubjects = 10; %all subjects
 fix_pos = 1;
 stim_size = [1,2];
 
-ntrials = 100; %all trials
+ntrials = 70; %all trials
 %ntrials = 15; %DEBUG: small number of trials
 valid_trials = (3:ntrials); % 3 <= valid_trials <= 100
 

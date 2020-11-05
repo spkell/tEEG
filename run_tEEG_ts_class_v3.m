@@ -21,10 +21,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Classifier conditions
-fix_pos = (2:5);
-eeg_type = 1;
-stim_size = 1;
-ntrials = 25;
+fix_pos = 1;
+eeg_type = 2;
+stim_size = (1:2);
+ntrials = 100;
 
 ntarget_combinations = length(fix_pos) * length(eeg_type) * length(stim_size);
 chance = 1 / ntarget_combinations;
@@ -72,7 +72,7 @@ confidence_interval = ci(class_raw_mat,95,1);
 
 %Plot average results with 95% confidence interval overlay in same figure
 subplot(2,1,2);
-continuous_error_bars(class_avg, time_values, confidence_interval, 0, 'b',1)
+continuous_error_bars(class_avg, time_values, confidence_interval, 0, 'r',1) %Change when superimposing teeg/eeeg externally
 
 %Configure individual classification plot
 xlim([min(time_values),max(time_values)]);
