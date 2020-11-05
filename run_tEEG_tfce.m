@@ -10,55 +10,47 @@ Purpose:
  statistical significance in tEEG vs. eEEG classification ability.
 
 TODO:
-    1. Produce dataset of 10 subjects x 494 classification accuracies, and
-    run tfce to determine statistic significance of tEEG and eEEG above
-    chance classification separately.
-    
-    2. Produce t/eEEG datasets in same script and use one dataset as the
-    mean? This doesn't take the variablilty of the "mean" dataset into
-    account, only the variability of the query dataset's mean...
+    1. allow inputs of either tEEG and or eEEG
+
+    2. update chance line to not include tEEG and eEEG as targets
 
 %}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%{
-% make a fake dataset using randomized data
-clear d nh zd
-nsamp = 10; % number of samples (participants)
-nfeat = 100; % number of features (timepoints)
-d.samples = rand([nsamp nfeat]); % random data, centered around 0.5 (e.g., chance decoding)
-
-% add an offset to artificially force more significant time points
-offset = .25;
-d.samples = d.samples + offset;
-%}
-
 %Classifier conditions
 fix_pos = 1;
-eeg_type = 1;
+eeg_type = (1:2);
 stim_size = (1:2);
 ntrials = 100;
 
-ntarget_combinations = length(fix_pos) * length(eeg_type) * length(stim_size);
+ntarget_combinations = length(fix_pos) * length(stim_size); % *length(eeg_type);
 chance = 1 / ntarget_combinations;
 
 nsamp = 10; % number of samples (participants)
 nfeat = 494; % number of features (timepoints)
 
 %Preallocate memory to store classification of each subject
-class_raw_mat(nsamp,nfeat) = zeros();
+class_raw_mat(length(eeg_type),nsamp,nfeat) = zeros(); %2eeg_types x 10subjects x 494classification_accuracies
 
-%Runs timeseries classification for each subject
-for subject=1:nsamp
-
-    %runs ts classification
-    sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type, stim_size, ntrials); %1class-score x 494timepoints
+%Runs ts classification for each eeg type
+for eeg=1:length(eeg_type)
     
-    class_raw_mat(subject,:) = sample_map; %10class-score x 494timepoints
-end  
+    %Runs timeseries classification for each subject
+    for subject=1:nsamp
+
+        %runs ts classification
+        sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg, stim_size, ntrials); %494classification_accuracies
+
+        class_raw_mat(eeg,subject,:) = sample_map; %2eeg_types x 10subjects x 494classification_accuracies
+    end  
+end
 
 clear d nh zd
-d.samples = class_raw_mat;
+if length(eeg_type) == 1
+    d.samples = squeeze(class_raw_mat);
+else
+    d.samples = [squeeze(class_raw_mat(eeg_type(1),:,:));squeeze(class_raw_mat(eeg_type(2),:,:))]; %20subjects x 494classification_accuracies
+end
 
 % feature attributes
 d.fa.time = 1:nfeat;
@@ -66,8 +58,15 @@ d.a.fdim.labels = {'time'};
 d.a.fdim.values = {1:nfeat};
 
 % sample attributes
-d.sa.targets = ones(nsamp,1); % assume one condition (e.g., is decoding above chance for one condition, one type of electrode timecourse)
-d.sa.chunks = (1:nsamp)'; % each participant contributes one sample row of data
+targets = ones(nsamp,1); % assume one condition (e.g., is decoding above chance for one condition, one type of electrode timecourse)
+chunks = (1:nsamp)'; % each participant contributes one sample row of data
+if length(eeg_type) == 1
+    d.sa.targets = targets;
+    d.sa.chunks = chunks;
+else
+    d.sa.targets = [targets;2*targets];
+    d.sa.chunks = [chunks;chunks];
+end
 
 % create neighborhood structure, but keep time points independent
 nh = cosmo_cluster_neighborhood(d,'time',false); % we don't really want to cluster over anything (which treats multiple time points as a single time point).  we want to treat each time point independently, i think.
@@ -76,7 +75,9 @@ nh = cosmo_cluster_neighborhood(d,'time',false); % we don't really want to clust
 opt = struct(); % reset options structure
 opt.cluster_stat = 'tfce';  % Threshold-Free Cluster Enhancement
 opt.niter = 1000; % should be near 10k for publication, but can test at lower values
-opt.h0_mean = chance;
+if length(eeg_type) == 1
+    opt.h0_mean = chance; % not allowed in 2-tailed tests
+end
 opt.seed = 1; % should usually not be used, unless exact replication of results is required (keeping for this test script)
 opt.progress = true; % let's show for now
 
@@ -84,10 +85,15 @@ zd = cosmo_montecarlo_cluster_stat(d,nh,opt); % returns TFCE-corrected z-score f
 
 % plot results
 f(1) = figure;
+hold on
 
-% random order (so expect no clusters)
 t = 1:nfeat;
-plot(t,mean(d.samples)); % mean decoding over time
+if length(eeg_type) == 1
+    plot(t,mean(d.samples),'k'); % mean decoding over time
+else
+    plot(t,mean(d.samples(1:10,:)),'b'); % mean decoding over time for tEEG
+    plot(t,mean(d.samples(11:20,:)),'r'); % mean decoding over time for eEEG
+end
 ylim([0 1]);
 xlabel('time (ms)');
 ylabel('classification accuracy');
@@ -100,10 +106,15 @@ hold on;
 plot(t(zd_sig),.95*zd_sig(zd_sig),'.r','MarkerSize',10);
 
 % mark locations where performance is "significant" by uncorrected t-tests
-alpha = 0.05;
-[h,p] = ttest(d.samples,chance); % one-sample t-test (each column separately) against chance (0.5 for 2 targets)
-t_sig = p < alpha; % uncorrected p-value less than alpha = .05
-plot(t(t_sig),alpha*t_sig(t_sig),'.b','MarkerSize',10);
+if length(eeg_type) == 1 %mean not informative in 2-tailed test
+    alpha = 0.05;
+    [h,p] = ttest(d.samples,chance); % one-sample t-test (each column separately) against chance (0.5 for 2 targets)
+    t_sig = p < alpha; % uncorrected p-value less than alpha = .05
+    plot(t(t_sig),alpha*t_sig(t_sig),'.b','MarkerSize',10);
+else
+    labels = {'tEEG','eEEG','tfce sig'};
+    legend(labels);
+end
 
 %Label plot with relevent information
 fig_title = tEEG_figure_info(0, fix_pos, eeg_type, stim_size, ntrials);
