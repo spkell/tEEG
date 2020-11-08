@@ -19,9 +19,11 @@ TODO:
 
 %Classifier conditions
 fix_pos = 1;
-eeg_type = (1:2);
-stim_size = (1:2);
+eeg_type = [2,3];
+stim_size = [1,2];
 ntrials = 100;
+
+conds = tEEG_conditions(); %load names of experimental conditions
 
 ntarget_combinations = length(fix_pos) * length(stim_size); % *length(eeg_type);
 chance = 1 / ntarget_combinations;
@@ -39,7 +41,7 @@ for eeg=1:length(eeg_type)
     for subject=1:nsamp
 
         %runs ts classification
-        sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg, stim_size, ntrials); %494classification_accuracies
+        sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type(eeg), stim_size, ntrials); %494classification_accuracies              
 
         class_raw_mat(eeg,subject,:) = sample_map; %2eeg_types x 10subjects x 494classification_accuracies
     end  
@@ -49,7 +51,7 @@ clear d nh zd
 if length(eeg_type) == 1
     d.samples = squeeze(class_raw_mat);
 else
-    d.samples = [squeeze(class_raw_mat(eeg_type(1),:,:));squeeze(class_raw_mat(eeg_type(2),:,:))]; %20subjects x 494classification_accuracies
+    d.samples = [squeeze(class_raw_mat(1,:,:));squeeze(class_raw_mat(2,:,:))]; %20subjects x 494classification_accuracies
 end
 
 % feature attributes
@@ -111,15 +113,19 @@ if length(eeg_type) == 1 %mean not informative in 2-tailed test
     [h,p] = ttest(d.samples,chance); % one-sample t-test (each column separately) against chance (0.5 for 2 targets)
     t_sig = p < alpha; % uncorrected p-value less than alpha = .05
     plot(t(t_sig),alpha*t_sig(t_sig),'.b','MarkerSize',10);
+    labels = {conds.EEG_type{eeg_type},'tfce sig','t-test sig'};
 else
-    labels = {'tEEG','eEEG','tfce sig'};
-    legend(labels);
+    labels = {conds.EEG_type{eeg_type(1)},conds.EEG_type{eeg_type(2)},'tfce sig'};
 end
+legend(labels);
 
 %Label plot with relevent information
 fig_title = tEEG_figure_info(0, fix_pos, eeg_type, stim_size, ntrials);
 MarkPlot(fig_title);
 
 %Save figure
-file_name = strcat('ts_class_outputs/tEEG_tfce/autosave/',fig_title,'.fig');
-savefig(f,file_name)
+mat_fig_fpath = strcat('ts_class_outputs/tEEG_tfce/autosave/mat_figs/',fig_title,'.fig');
+pdf_fig_fpath = strcat('ts_class_outputs/tEEG_tfce/autosave/pdf_figs/',fig_title,'.pdf');
+savefig(f,mat_fig_fpath) %save as matlab figure
+orient landscape
+print('-dpdf',pdf_fig_fpath) %save as pdf

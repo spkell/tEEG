@@ -67,12 +67,18 @@ function fig_title = tEEG_figure_info(subject, fix_pos, eeg_type, stim_size, ntr
     
     if len_eeg_type > 1 %tEEG or eEEG
         for eeg=1:len_eeg_type
-            targs{targ_idx} = conds.EEG_type{eeg_type(eeg)};
+            if eeg_type(eeg) == 3
+                targs{targ_idx} = 'tEEG_eEEG';
+            else
+                targs{targ_idx} = conds.EEG_type{eeg_type(eeg)};
+            end
             targ_idx = targ_idx + 1;
         end
     elseif len_eeg_type == 1
-        if eeg_type == 0 %not a target, but fig includes all subjects
+        if eeg_type == 0 %not a target, but fig includes both eeg types
             params{param_idx} = 'tEEG-eEEG';
+        elseif eeg_type == 3 %eeg type is both tEEG and eEEG in same struct
+            params{param_idx} = 'tEEG+eEEG';
         else
             params{param_idx} = conds.EEG_type{eeg_type};
         end

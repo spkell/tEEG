@@ -17,7 +17,7 @@ function conds = tEEG_conditions()
     conds.fix_pos = {'Center','LeftCenter','LowerLeft',...
         'LowerRight','RightCenter','UpperLeft','UpperRight'};
     
-    conds.EEG_type = {'tEEG','eEEG'};
+    conds.EEG_type = {'tEEG','eEEG','t-eEEG'};
     
     conds.stim = {'large','small'};
     
@@ -28,14 +28,14 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %{
-     1                 2               3            4           5
-Participants   Fixation Positions   EEG Type   Stimuli Size   Channel
-1:'0341'       1:'Center'           1:'tEEG'   1:'large'      1:'O1'
-2:'0976'       2:'LeftCenter'       2:'eEEG'   2:'small'      2:'Oz'
-3:'1419'       3:'LowerLeft'                                  3:'O2'
-4:'2630'       4:'LowerRight'                                 4:'P3'
-5:'2785'       5:'RightCenter'                                5:'Pz'
-6:'5469'       6:'UpperLeft'                                  6:'P4'
+     1                 2               3                4           5
+Participants   Fixation Positions   EEG Type       Stimuli Size   Channel
+1:'0341'       1:'Center'           1:'tEEG'       1:'large'      1:'O1'
+2:'0976'       2:'LeftCenter'       2:'eEEG'       2:'small'      2:'Oz'
+3:'1419'       3:'LowerLeft'        3:'tEEG-eEEG'                 3:'O2'
+4:'2630'       4:'LowerRight'                                     4:'P3'
+5:'2785'       5:'RightCenter'                                    5:'Pz'
+6:'5469'       6:'UpperLeft'                                      6:'P4'
 7:'6541'       7:'UpperRight'
 8:'6892'
 9:'8003'

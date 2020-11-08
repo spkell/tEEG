@@ -8,7 +8,7 @@
 % another plot containing the average classification performance for each
 % time point.
 %
-% * targets: 2 subjects XOR fix_pos XOR eeg_type XOR stim_size
+% * targets: subjects OR fix_pos OR eeg_type OR stim_size
 % * chunks: program assumes that every trial is independent
 % * trials: each trial is the summation of a given index from each
 %   of the 494 epochs
@@ -22,7 +22,7 @@
 
 %Classifier conditions
 fix_pos = 1;
-eeg_type = 2;
+eeg_type = 3;
 stim_size = (1:2);
 ntrials = 100;
 
@@ -87,5 +87,8 @@ fig_title = tEEG_figure_info(0, fix_pos, eeg_type, stim_size, ntrials);
 MarkPlot(fig_title);
 
 %Save figure
-file_name = strcat('ts_class_outputs/tEEG_ts_class_v3/autosave/',fig_title,'.fig');
-savefig(f,file_name)
+mat_fig_fpath = strcat('ts_class_outputs/tEEG_ts_class_v3/autosave/mat_figs/',fig_title,'.fig');
+pdf_fig_fpath = strcat('ts_class_outputs/tEEG_ts_class_v3/autosave/pdf_figs/',fig_title,'.pdf');
+savefig(f,mat_fig_fpath) %save as matlab figure
+orient landscape
+print('-dpdf',pdf_fig_fpath) %save as pdf

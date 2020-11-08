@@ -63,6 +63,8 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
                             ds_targs{targ} = temp_ds_targs.data(1:6,:,rand_trials);
                         case 2 % eeg_type of 2 is eEEG
                             ds_targs{targ} = temp_ds_targs.data(7:12,:,rand_trials);
+                        case 3 % eeg_type of 2 is tEEG and eEEG
+                            ds_targs{targ} = temp_ds_targs.data(:,:,rand_trials);
                         otherwise
                             error('invalid eeg_type (%d) requested',eeg_type(eeg))
                     end
@@ -76,7 +78,8 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
    nchans = size(ds_targs{1},1); % RM: this is somewhat hardcoded, as it depends on the above selection code.  but should be ok because it should never change
-
+   %ds.fa.chan can only use integers (1:6)
+   
    %Extract number of time points and trials for each stimuli
    ntimepoints = size(ds_targs{1},2); %same for all targets
    
@@ -102,6 +105,9 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
    
    %a.fdim.values
    channels = conditions.channel;
+   if nchans == 12 %combined tEEG/eEEG
+       channels = [channels;channels];
+   end
    values = {channels, 0:ntimepoints-1}; % RM: I need to check to see if first time point represents time zero (synchronous with stimulus onset), in which case this might be (1:ntimepoints)-1 to represent time in ms
    values = values';
    ds.a.fdim.values = values;
