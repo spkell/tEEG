@@ -34,13 +34,19 @@ function sample = tEEG_ts_class_backend(subject, fix_pos, eeg_type, stim_size, n
     % assume all trials are independent (although not really true for the data collection method as trials occurr without an inter-trial interval)
     ds_tl.sa.chunks = (1:size(ds_tl.samples,1))';
     % create as many chunks as there are trials for each dataset (NOTE: not sure if last argument is defined in the best possible way here if ntrials differs for each dataset)
-    ds_tl.sa.chunks = cosmo_chunkize(ds_tl, ntrials);
+    
+    %nchunks = ntrials; %take-one-fold out
+    nchunks = 2; %Need 2 chunks for split half analysis  
+    ds_tl.sa.chunks = cosmo_chunkize(ds_tl, nchunks);
 
     % do a take-one-fold out cross validation.
     % except when using a splithalf correlation measure it is important that
     % the partitions are *balanced*, i.e. each target (or class) is presented
     % equally often in each chunk
-    partitions=cosmo_nchoosek_partitioner(ds_tl,1);
+   
+    %partitions=cosmo_nchoosek_partitioner(ds_tl,1); %take-one-fold out
+    partitions=cosmo_nchoosek_partitioner(ds_tl,'half'); %split half
+    
     partitions=cosmo_balance_partitions(partitions, ds_tl);
 
     %npartitions=numel(partitions);
