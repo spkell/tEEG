@@ -25,6 +25,7 @@ fix_pos = 1;
 eeg_type = 1;
 stim_size = (1:2);
 ntrials = 100;
+parietal = 1; %Don't include parietal electrode channels
 
 ntarget_combinations = length(fix_pos) * length(eeg_type) * length(stim_size);
 chance = 1 / ntarget_combinations;
@@ -42,7 +43,7 @@ class_raw_mat(nsubjects,size(time_values,2)) = zeros();
 for subject=1:nsubjects
 
     %runs ts classification
-    sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type, stim_size, ntrials); %1class-score x 494timepoints
+    sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type, stim_size, ntrials, parietal); %1class-score x 494timepoints
     
     class_raw_mat(subject,:) = sample_map; %10class-score x 494timepoints
 end  

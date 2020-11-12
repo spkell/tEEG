@@ -3,7 +3,7 @@
 tEEG time-by-time transfer classification
 
 Author: Sean Kelly & Pr. Mruczek
-Filename: run_tEEG_time_gen.m
+Filename: run_tEEG_time_gen_v0.m
 Date: 11/9/20
 
 Purpose:

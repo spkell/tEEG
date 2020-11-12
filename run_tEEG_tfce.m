@@ -19,9 +19,11 @@ TODO:
 
 %Classifier conditions
 fix_pos = 1;
-eeg_type = [2,3];
+%eeg_type = [2,3]; %Compare EEG type performance
+eeg_type = [3,3]; %Compare Parietal omission performance
 stim_size = [1,2];
 ntrials = 100;
+parietal = [0,1]; %Compare Parietal omission performance
 
 conds = tEEG_conditions(); %load names of experimental conditions
 
@@ -41,7 +43,7 @@ for eeg=1:length(eeg_type)
     for subject=1:nsamp
 
         %runs ts classification
-        sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type(eeg), stim_size, ntrials); %494classification_accuracies              
+        sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type(eeg), stim_size, ntrials, parietal(eeg)); %494classification_accuracies              
 
         class_raw_mat(eeg,subject,:) = sample_map; %2eeg_types x 10subjects x 494classification_accuracies
     end  
@@ -123,9 +125,13 @@ legend(labels);
 fig_title = tEEG_figure_info(0, fix_pos, eeg_type, stim_size, ntrials);
 MarkPlot(fig_title);
 
+%{
+
 %Save figure
 mat_fig_fpath = strcat('ts_class_outputs/tEEG_tfce/autosave/mat_figs/',fig_title,'.fig');
 pdf_fig_fpath = strcat('ts_class_outputs/tEEG_tfce/autosave/pdf_figs/',fig_title,'.pdf');
 savefig(f,mat_fig_fpath) %save as matlab figure
 orient landscape
 print('-dpdf',pdf_fig_fpath) %save as pdf
+
+%}

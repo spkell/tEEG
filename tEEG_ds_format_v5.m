@@ -14,10 +14,10 @@
 % additional input is the number of trials that wil be considered for each
 % sample.
 %
-%Example: tEEG_ds_format_v5(1, [2,5], [1,2], 1, 50)
+%Example: tEEG_ds_format_v5(1, [2,5], [1,2], 1, 50, 0)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntrials_request)
+function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntrials_request, parietal)
 
     %load string representations of trial parameters in conditions struct
     conditions = tEEG_conditions();
@@ -58,15 +58,30 @@ function ds = tEEG_ds_format_v5(subject, fixation_pos, eeg_type, stim_size, ntri
                 for eeg=1:len_eeg_type % RM: this loop should work, even if len_eeg_type==1
                     rand_trials = randperm(size(temp_ds_targs.data,3)); %ideally ntrials_total // tEEG_1419_large_RightCenter.mat: ntrials = 76
                     rand_trials = rand_trials(1:ntrials_request);
-                    switch eeg_type(eeg)
-                        case 1 % eeg_type of 1 is tEEG
-                            ds_targs{targ} = temp_ds_targs.data(1:6,:,rand_trials);
-                        case 2 % eeg_type of 2 is eEEG
-                            ds_targs{targ} = temp_ds_targs.data(7:12,:,rand_trials);
-                        case 3 % eeg_type of 2 is tEEG and eEEG
-                            ds_targs{targ} = temp_ds_targs.data(:,:,rand_trials);
-                        otherwise
-                            error('invalid eeg_type (%d) requested',eeg_type(eeg))
+                    
+                    if parietal == 1
+                        switch eeg_type(eeg)
+                            case 1 % eeg_type of 1 is tEEG
+                                ds_targs{targ} = temp_ds_targs.data(1:6,:,rand_trials);
+                            case 2 % eeg_type of 2 is eEEG
+                                ds_targs{targ} = temp_ds_targs.data(7:12,:,rand_trials);
+                            case 3 % eeg_type of 2 is tEEG and eEEG
+                                ds_targs{targ} = temp_ds_targs.data(:,:,rand_trials);
+                            otherwise
+                                error('invalid eeg_type (%d) requested',eeg_type(eeg))
+                        end
+                    elseif parietal == 0
+                        switch eeg_type(eeg)
+                            case 1 % eeg_type of 1 is tEEG
+                                ds_targs{targ} = temp_ds_targs.data(1:3,:,rand_trials);
+                            case 2 % eeg_type of 2 is eEEG
+                                ds_targs{targ} = temp_ds_targs.data(7:9,:,rand_trials);
+                            case 3 % eeg_type of 2 is tEEG and eEEG
+                                ds_targs{targ} = temp_ds_targs.data([1:3,7:9],:,rand_trials);
+                            otherwise
+                                error('invalid eeg_type (%d) requested',eeg_type(eeg))
+                        end
+                        
                     end
                     targ_labels{targ} = strcat(conditions.EEG_type{eeg},'_',subject_param{subj},'_',stim_param{stim},'_',fix_pos_param{pos});
                     targ = targ + 1;

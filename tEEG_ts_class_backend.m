@@ -13,18 +13,19 @@
 %
 %Dependencies: FieldTrip, CosmoMVPA
 %
-%Example: tEEG_ts_class_backend(1,1,1,[1,2],50)
-%         => Subject 1, Center fixation, tEEG, lg vs sm stim, 50 trials
+%Example: tEEG_ts_class_backend(1,1,1,[1,2],50, 0)
+%         => Subject 1, Center fixation, tEEG, lg vs sm stim, 50 trials,
+%         disclude parietal
 %
 %TODO: 1. use different target inputs for classification
 %      2. randomize which trials are selected with ntrials
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function sample = tEEG_ts_class_backend(subject, fix_pos, eeg_type, stim_size, ntrials)
+function sample = tEEG_ts_class_backend(subject, fix_pos, eeg_type, stim_size, ntrials, parietal)
 
     %load formatted dataset
     %Params = subject(1:10), fixation_position(1:7), (t/e)EEG(1:2), stim_size(1:2), ntrials(3:100)
-    ds_tl = tEEG_ds_format_v5(subject, fix_pos, eeg_type, stim_size, ntrials);
+    ds_tl = tEEG_ds_format_v5(subject, fix_pos, eeg_type, stim_size, ntrials, parietal);
 
     % just to check everything is ok
     cosmo_check_dataset(ds_tl);
