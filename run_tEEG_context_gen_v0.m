@@ -21,7 +21,7 @@ TODO:
 conds = tEEG_conditions();
 
 fix_pos = 1;
-eeg_type = [2,1]; %train with eEEG, test with tEEG
+eeg_type = [1,3]; %train with eEEG, test with tEEG
 stim_size = [1,2]; %large vs small stimuli target conditions
 ntrials = 100;
 parietal = 1;

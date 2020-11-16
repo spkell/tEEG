@@ -20,3 +20,9 @@ Analyses Theory
     This analysis uses the linear descriminant analysis as the classifier, and a split half cross-validation to train and test the input set of trials. Time generalization trains the classifier using half of the input trials for a given time point just as the time series classification does. However, this analysis differs in how the classifier performance is tested. Instead of training the classifier at one given time point, and testing the classifier at only the same time point, the classifier's performance is measured for how it classifies the pattern across 6 electrodes at every time point, and it returns a classification accuracy for each time point for the n-time point trained classifier. This is done for each classifier trained at each time point.
 
     The output of this analysis is a matrix (494x494) which illustrates the classification performance of each n-time point trained classifier at each m-time point that the classifier is tested on. The resulting heat map gives insight to the times in which a pattern across the 6 electrodes is repeated during the 494ms trial.
+
+
+Classification Assumptions:
+
+1. Each 494ms epoch (trial) is assumed to be independent and identically distributed (i.i.d.), which is a stationarity assumption that there is a probability distribution over examples that remains stationary over time.
+    Although there is an aspect of subject learning involved in each trial, with the predictiveness of seeing a large vs small checker board growing as the number of trials increase. For example, when the subject first sees a series of large-small-large-small checker boards, they have not really established a recognitiion pattern for which checker board. When the pattern is repeated for more trials, such as 20, 40, 60 iterations, signals of pattern recognition are increasingly represented.

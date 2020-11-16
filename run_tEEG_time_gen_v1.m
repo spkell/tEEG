@@ -7,7 +7,7 @@ Filename: run_tEEG_time_gen_v1.m
 Date: 11/9/20
 
 Purpose:
- Script runs MVPA generalization across time using all subjects.
+    Script runs MVPA generalization across time using all subjects.
 
 TODO:
     1. Add back other time generalizations with average across participants
