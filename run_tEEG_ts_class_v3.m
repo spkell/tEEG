@@ -25,7 +25,7 @@ fix_pos = 1;
 eeg_type = 1;
 stim_size = (1:2);
 ntrials = 100;
-parietal = 1; %Don't include parietal electrode channels
+parietal = 1; %Include parietal electrode channels
 
 ntarget_combinations = length(fix_pos) * length(eeg_type) * length(stim_size);
 chance = 1 / ntarget_combinations;

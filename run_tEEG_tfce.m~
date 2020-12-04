@@ -102,9 +102,7 @@ hold on
 
 t = 1:nfeat;
 if length(eeg_type) == 1
-    %plot(t,mean(d.samples),'k'); % mean decoding over time
-    confidence_interval = ci(d.samples,95,1);
-    continuous_error_bars(mean(d.samples), t, confidence_interval, 1, 'b',1)
+    plot(t,mean(d.samples),'k'); % mean decoding over time
 else
     plot(t,mean(d.samples(1:10,:)),'b'); % mean decoding over time for tEEG
     plot(t,mean(d.samples(11:20,:)),'r'); % mean decoding over time for eEEG
