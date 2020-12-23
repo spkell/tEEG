@@ -29,7 +29,7 @@ parietal = [0,1]; %Compare Parietal omission performance
 
 %Classifier conditions
 fix_pos = 1;
-eeg_type = 1; %Compare Parietal omission performance
+eeg_type = 1; %eeg_type = [1,2];
 stim_size = [1,2];
 ntrials = 100;
 parietal = 1; %Compare Parietal omission performance
@@ -52,7 +52,7 @@ for eeg=1:length(eeg_type)
     for subject=1:nsamp
 
         %runs ts classification
-        sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type(eeg), stim_size, ntrials, parietal(eeg)); %494classification_accuracies              
+        sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type(eeg), stim_size, ntrials, parietal); %494classification_accuracies              
 
         class_raw_mat(eeg,subject,:) = sample_map; %2eeg_types x 10subjects x 494classification_accuracies
     end  
@@ -87,7 +87,7 @@ nh = cosmo_cluster_neighborhood(d,'time',false); % we don't really want to clust
 % run TFCE (might play around with some options here)
 opt = struct(); % reset options structure
 opt.cluster_stat = 'tfce';  % Threshold-Free Cluster Enhancement
-opt.niter = 1000; % should be near 10k for publication, but can test at lower values
+opt.niter = 10000; % should be near 10k for publication, but can test at lower values
 if length(eeg_type) == 1
     opt.h0_mean = chance; % not allowed in 2-tailed tests
 end
@@ -104,7 +104,7 @@ t = 1:nfeat;
 if length(eeg_type) == 1
     %plot(t,mean(d.samples),'k'); % mean decoding over time
     confidence_interval = ci(d.samples,95,1);
-    continuous_error_bars(mean(d.samples), t, confidence_interval, 1, 'b',1)
+    continuous_error_bars(mean(d.samples), t, confidence_interval, 0, 'b',1)
 else
     plot(t,mean(d.samples(1:10,:)),'b'); % mean decoding over time for tEEG
     plot(t,mean(d.samples(11:20,:)),'r'); % mean decoding over time for eEEG
@@ -126,7 +126,7 @@ if length(eeg_type) == 1 %mean not informative in 2-tailed test
     [h,p] = ttest(d.samples,chance); % one-sample t-test (each column separately) against chance (0.5 for 2 targets)
     t_sig = p < alpha; % uncorrected p-value less than alpha = .05
     plot(t(t_sig),alpha*t_sig(t_sig),'.b','MarkerSize',10);
-    labels = {conds.EEG_type{eeg_type},'tfce sig','t-test sig'};
+    labels = {'95% conf',conds.EEG_type{eeg_type},'tfce sig','t-test sig'};
 else
     labels = {conds.EEG_type{eeg_type(1)},conds.EEG_type{eeg_type(2)},'tfce sig'};
 end
@@ -145,4 +145,37 @@ savefig(f,mat_fig_fpath) %save as matlab figure
 orient landscape
 print('-dpdf',pdf_fig_fpath) %save as pdf
 
+%}
+
+%{
+
+%%%%% Used to create summary figures %%%%%
+t = 1:nfeat;
+f = figure();
+hold on
+
+plot(t,mean(d.samples(1:10,:)),'r'); % mean decoding over time for tEEG
+plot(t,mean(d.samples(11:20,:)),'g'); % mean decoding over time for eEEG
+
+ylim([0 1]);
+xlabel('time (ms)');
+ylabel('classification accuracy');
+title('Classification Accuracy - All Participants');
+hline(chance,':k','chance');
+
+% mark location where performance is "significant" by tfce
+zd_sig = abs(zd.samples) > 1.96; % two-tailed (this is really an estimate, assuming a large sample size - we need to look up threshold for n=10 for out study)
+hold on;
+plot(t(zd_sig),.95*zd_sig(zd_sig),'.r','MarkerSize',10);
+
+alpha = 0.05;
+[h,p] = ttest(d.samples(1:10,:), d.samples(11:20,:)); % one-sample t-test (each column separately) against chance (0.5 for 2 targets)
+t_sig = p < alpha; % uncorrected p-value less than alpha = .05
+plot(t(t_sig),alpha*t_sig(t_sig),'.b','MarkerSize',10);
+labels = {'eEEG','t-eEEG','tfce sig','t-test sig'};
+
+legend(labels);
+
+orient landscape
+print('-dpdf','new_fig') %save as pdf
 %}

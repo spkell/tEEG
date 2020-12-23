@@ -37,7 +37,7 @@ function sample = tEEG_ts_class_backend(subject, fix_pos, eeg_type, stim_size, n
     % create as many chunks as there are trials for each dataset (NOTE: not sure if last argument is defined in the best possible way here if ntrials differs for each dataset)
     
     %nchunks = ntrials; %take-one-fold out
-    nchunks = 2; %Need 2 chunks for split half analysis  
+    nchunks = 10; %Need 2 chunks for split half analysis  
     ds_tl.sa.chunks = cosmo_chunkize(ds_tl, nchunks);
 
     % do a take-one-fold out cross validation.

@@ -18,7 +18,7 @@ TODO:
 conds = tEEG_conditions();
 
 fix_pos = 1;
-eeg_type = 2;
+eeg_type = 1;
 stim_size = [1,2];
 ntrials = 100;
 parietal = 1;

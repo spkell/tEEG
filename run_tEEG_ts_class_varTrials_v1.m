@@ -25,9 +25,6 @@
 %TODO: take steps between trials instead of classifying for every 3:ntrials
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% reset citation list
-cosmo_check_external('-tic');
-
 %Classifier conditions
 
 nsubjects = 10; %all subjects
@@ -36,14 +33,14 @@ nsubjects = 10; %all subjects
 fix_pos = 1;
 stim_size = [1,2];
 
-ntrials = 70; %all trials
+ntrials = 100; %all trials
 %ntrials = 15; %DEBUG: small number of trials
 valid_trials = (3:ntrials); % 3 <= valid_trials <= 100
 
 ntrial_steps = 5; %number of steps between trial size taken in by the classifier
-trial_sel = valid_trials(1:ntrial_steps:end); %selected ntrial lengths to examine
+trial_sel = valid_trials(2:ntrial_steps:end); %selected ntrial lengths to examine
 len_trial_sel = length(trial_sel);
-
+eeg_types = [1,2,3];
 
 %retrieve participant conditions
 conditions = tEEG_conditions();
@@ -51,10 +48,10 @@ conditions = tEEG_conditions();
 time_values = (1:494); % first dim (channels got nuked)
 
 %Preallocate memory of matrix to store all classification scores generated
-ts_class_mat(1:nsubjects,size(time_values,2),len_trial_sel,2) = zeros(); %10subjects x 494ms x ntrial_sizes x 2eegs
+ts_class_mat(1:nsubjects,size(time_values,2),len_trial_sel,size(eeg_types,2)) = zeros(); %10subjects x 494ms x ntrial_sizes x n_eegs
 
 %Extract classifier scored for each trial combination
-for eeg_type=1:2 %tEEG and eEEG
+for eeg_type=1:size(eeg_types,2) %tEEG and/or eEEG and/or teEEG
 
     for trial_count=1:len_trial_sel
 
@@ -62,7 +59,7 @@ for eeg_type=1:2 %tEEG and eEEG
         for subject=1:nsubjects
 
             %runs ts classification
-            sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type, stim_size, trial_sel(trial_count)); %1subject x 494(classifier performance) x ntrials
+            sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type, stim_size, trial_sel(trial_count),1); %1subject x 494(classifier performance) x ntrials
             %trial_count+2 since 1,2 trials aren't accepted by classifier
             
             ts_class_mat(subject,:,trial_count,eeg_type) = sample_map; %10subjects x 494cl-performance x ntrials_selected x 2eegs
@@ -79,9 +76,9 @@ end
 
 
 %calculate integral of each subject's classification vector
-roc_indiv_zeros(1:nsubjects,1:2,len_trial_sel) = zeros(); %10subjects * 2eeg_types * ntrials_selected
+roc_indiv_zeros(1:nsubjects,size(eeg_types,2),len_trial_sel) = zeros(); %10subjects * n_eeg_types * ntrials_selected
 roc_indiv = roc_indiv_zeros;
-for eeg_type=1:2
+for eeg_type=1:size(eeg_types,2)
     for subject=1:nsubjects
         for trial_count=1:len_trial_sel
             roc_indiv(subject,eeg_type,trial_count) = integral_sl_map(time_values,ts_class_mat(subject,:,trial_count,eeg_type));
@@ -94,7 +91,7 @@ end
 f(1) = figure;
 for subject=1:nsubjects
     subplot(ceil(nsubjects/2),2,subject); %formats figure to show plots for each subjects
-    for eeg_type=1:2
+    for eeg_type=1:size(eeg_types,2)
         roc_vector = squeeze(roc_indiv(subject,eeg_type,:));
         plot(trial_sel,roc_vector);
         hold on
@@ -104,10 +101,10 @@ for subject=1:nsubjects
     xlim([min(3),max(trial_sel)]);
     ylabel('Classifier Integral'); %Class Accuracy * ms
     xlabel('Trials Used to Train Classifier');
-    title_string = strcat('ROC: tEEG vs eEEG // Subject: ', conditions.subject{subject});
+    title_string = strcat('ROC: tEEG vs eEEG vs teEEG // Subject: ', conditions.subject{subject});
     title(title_string);
-    legend('tEEG','eEEG');
-    hline(0,'k','chance');
+    legend('tEEG','eEEG','teEEG');
+    %hline(0,'chance');
     hold off
 end
 figure_title = tEEG_figure_info(0,fix_pos,0,stim_size,0);
@@ -119,7 +116,7 @@ f(2) = figure; %figure to display roc of both eeg types for avg of all subjects
 %Find 95% confidence interval for mean of all subjects AUC x ntrials
 %using each participants independent AUC's, for both tEEG and eEEG
 confidence_interval_eeg(2,len_trial_sel) = zeros();
-for eeg=1:2
+for eeg=1:size(eeg_types,2)
     temp_conf_int = ci(roc_indiv(:,eeg,:),95,1);
     confidence_interval_eeg(eeg,:) = squeeze(temp_conf_int)';
 end
@@ -133,7 +130,7 @@ roc_zeros(1:2,len_trial_sel) = zeros(); %2eeg_types * 98trials
 roc = roc_zeros; %resets size in case of larger roc matrix loaded
 
 %calculate integral of each average classification vector
-for eeg_type=1:2 %tEEG and eEEG
+for eeg_type=1:size(eeg_types,2) %tEEG and eEEG
     for trial_count=1:len_trial_sel
         %store area under curve for each classification plot for each 
         roc(eeg_type,trial_count) = integral_sl_map(time_values,class_avg(:,trial_count,eeg_type)); %2eeg x 98trials
@@ -142,18 +139,22 @@ end
 
 %Plot average area under curve for tEEG and eEEG
 chance = 0;
-color = 'r';
-for eeg=1:2
+color = 'b';
+for eeg=1:size(eeg_types,2)
     if eeg == 2
-        color = 'b';
+        color = 'r';
+    elseif eeg == 3
+        color = 'g';
     end
     continuous_error_bars(roc(eeg,:), trial_sel, confidence_interval_eeg(eeg,:), 0, color, 0)
     hold on
 end
-color = 'r';
-for eeg=1:2
+color = 'b';
+for eeg=1:size(eeg_types,2)
     if eeg == 2
-        color = 'b';
+        color = 'r';
+    elseif eeg == 3
+        color = 'g';
     end
     plot(trial_sel, roc(eeg,:), color, 'LineWidth', 3)
 end
@@ -184,6 +185,60 @@ for eeg=1:size(class_avg,3)
     MarkPlot(figure_title);
 end 
 
+%{
+%%%%% To produce figures in summary %%%%%
+
+nsubjects = 10; %all subjects
+fix_pos = 1;
+stim_size = [1,2];
+
+ntrials = 100; %all trials
+valid_trials = (3:ntrials); % 3 <= valid_trials <= 100
+ntrial_steps = 1; %number of steps between trial size taken in by the classifier
+trial_sel = valid_trials(2:ntrial_steps:end); %selected ntrial lengths to examine
+len_trial_sel = length(trial_sel);
+eeg_type = 2;
+
+%retrieve participant conditions
+conditions = tEEG_conditions();
+
+time_values = (1:494); % first dim (channels got nuked)
+
+%Preallocate memory of matrix to store all classification scores generated
+ts_class_mat(1:nsubjects,size(time_values,2),len_trial_sel) = zeros();
+for trial_count=1:len_trial_sel
+
+    %Runs timeseries classification for each subject
+    for subject=1:nsubjects
+
+        %runs ts classification
+        sample_map = tEEG_ts_class_backend(subject, fix_pos, eeg_type, stim_size, trial_sel(trial_count),1); %1subject x 494(classifier performance) x ntrials
+        %trial_count+2 since 1,2 trials aren't accepted by classifier
+
+        ts_class_mat(subject,:,trial_count) = sample_map; %10subjects x 494cl-performance x ntrials_selected x 2eegs
+    end
+end
+
+class_avg = mean(ts_class_mat,1); %1 x 494cl-performance x 98trials
+class_avg = squeeze(class_avg);
+trans_class_avg = class_avg'
+
+figure()
+imagesc(trans_class_avg, [.3 0.8]);
+colorbar();
+
+newyticks = (5:10:ntrials)
+set(gca,'YTickLabel',newyticks)
+ylabel('Trials Used to Train Classifier');
+xlabel('Time (ms)');
+
+title("eEEG - Classification Accuracy as Training Set is Increased")
+
+orient landscape
+print('-dpdf',"var_trials_eEEG") %save as pdf
+
+%{
 %Save figures for each script run in one file
 file_name = strcat('ts_class_outputs/tEEG_ts_class_varTrials/autosave/',figure_title,'.fig');
+%}
 savefig(f,file_name)

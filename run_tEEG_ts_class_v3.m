@@ -59,6 +59,7 @@ end
 
 %Configure individual classification plot
 xlim([min(time_values),max(time_values)]);
+ylim([0 1]);
 ylabel('classification accuracy');
 xlabel('time (ms)');
 title('Individual Superposition Classification Accuracy');
@@ -73,10 +74,11 @@ confidence_interval = ci(class_raw_mat,95,1);
 
 %Plot average results with 95% confidence interval overlay in same figure
 subplot(2,1,2);
-continuous_error_bars(class_avg, time_values, confidence_interval, 0, 'r',1) %Change when superimposing teeg/eeeg externally
+continuous_error_bars(class_avg, time_values, confidence_interval, 0, 'b',1) %Change when superimposing teeg/eeeg externally
 
 %Configure individual classification plot
 xlim([min(time_values),max(time_values)]);
+ylim([0 1]);
 ylabel('classification accuracy');
 xlabel('time (ms)');
 postfix='Average Classification Accuracy - All Participants';
@@ -87,9 +89,11 @@ title(postfix);
 fig_title = tEEG_figure_info(0, fix_pos, eeg_type, stim_size, ntrials);
 MarkPlot(fig_title);
 
+%{
 %Save figure
 mat_fig_fpath = strcat('ts_class_outputs/tEEG_ts_class_v3/autosave/mat_figs/',fig_title,'.fig');
 pdf_fig_fpath = strcat('ts_class_outputs/tEEG_ts_class_v3/autosave/pdf_figs/',fig_title,'.pdf');
 savefig(f,mat_fig_fpath) %save as matlab figure
 orient landscape
 print('-dpdf',pdf_fig_fpath) %save as pdf
+%}
