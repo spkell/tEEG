@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Author: Sean Kelly
-%Filename: tEEG_ts_class_backend.m
-%Date: 10/10/20
+%Filename: tEEG_ts_class_backend_noise_v0.m
+%Date: 12/29/20
 %
 %Purpose: This classifier performs MVPA analyses on tEEG and eEEG data.
 % returns timeseries classification of data with given parameters.
@@ -13,7 +13,7 @@
 %
 %Dependencies: FieldTrip, CosmoMVPA
 %
-%Example: tEEG_ts_class_backend(1,1,1,[1,2],50, 0)
+%Example: tEEG_ts_class_backend_noise)_v0(1,1,1,[1,2],50, 0)
 %         => Subject 1, Center fixation, tEEG, lg vs sm stim, 50 trials,
 %         disclude parietal
 %
@@ -21,16 +21,11 @@
 %      2. randomize which trials are selected with ntrials
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function sample = tEEG_ts_class_backend(subject, fix_pos, eeg_type, stim_size, ntrials, parietal)
+function sample = tEEG_ts_class_backend_noise_v0(subject, noise_pos, eeg_type, ntrials, parietal)
 
     %load formatted dataset
-    %Params = subject(1:10), fixation_position(1:7), (t/e)EEG(1:2), stim_size(1:2), ntrials(3:100)
-    noise = 1;
-    if noise == 0
-        ds_tl = tEEG_ds_format_v5(subject, fix_pos, eeg_type, stim_size, ntrials, parietal);
-    elseif noise == 1
-        ds_tl = tEEG_ds_format_v5(subject, fix_pos, eeg_type, stim_size, ntrials, parietal);
-    end
+    %Params = subject(1:10), noise_condition(1:3), (t/e)EEG(1:2), ntrials(3:100), (1,2)
+    ds_tl = tEEG_ds_format_noise_v0(subject, noise_pos, eeg_type, ntrials, parietal);
 
     % just to check everything is ok
     cosmo_check_dataset(ds_tl);
