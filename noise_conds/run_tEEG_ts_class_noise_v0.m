@@ -21,9 +21,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Classifier conditions
-noise_pos = [3,1]; %[Clench,Chew]
-eeg_type = 2;
-ntrials = 100;
+noise_pos = [2,1]; %[Small,Clench,Chew]
+eeg_type = 1;
+ntrials = 30;
 parietal = 1; %Include parietal electrode channels
 
 ntarget_combinations = length(noise_pos) * length(eeg_type);
@@ -39,10 +39,10 @@ nsubjects = 9; %all subjects but first, since they have no noise conditions
 class_raw_mat(nsubjects,size(time_values,2)) = zeros();
 
 %Runs timeseries classification for each subject
-for subject=2:nsubjects
+for subject=1:nsubjects
 
     %runs ts classification
-    sample_map = tEEG_ts_class_backend_noise_v0(subject, noise_pos, eeg_type, ntrials, parietal); %1class-score x 494timepoints
+    sample_map = tEEG_ts_class_backend_noise_v0(subject+1, noise_pos, eeg_type, ntrials, parietal); %1class-score x 494timepoints
     
     class_raw_mat(subject,:) = sample_map; %10class-score x 494timepoints
 end  

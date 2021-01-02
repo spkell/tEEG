@@ -154,8 +154,8 @@ t = 1:nfeat;
 f = figure();
 hold on
 
-plot(t,mean(d.samples(1:10,:)),'r'); % mean decoding over time for tEEG
-plot(t,mean(d.samples(11:20,:)),'g'); % mean decoding over time for eEEG
+plot(t,mean(d.samples(1:9,:)),'b'); % mean decoding over time for tEEG
+plot(t,mean(d.samples(10:18,:)),'r'); % mean decoding over time for eEEG
 
 ylim([0 1]);
 xlabel('time (ms)');
@@ -169,7 +169,7 @@ hold on;
 plot(t(zd_sig),.95*zd_sig(zd_sig),'.r','MarkerSize',10);
 
 alpha = 0.05;
-[h,p] = ttest(d.samples(1:10,:), d.samples(11:20,:)); % one-sample t-test (each column separately) against chance (0.5 for 2 targets)
+[h,p] = ttest(d.samples(1:9,:), d.samples(10:18,:)); % one-sample t-test (each column separately) against chance (0.5 for 2 targets)
 t_sig = p < alpha; % uncorrected p-value less than alpha = .05
 plot(t(t_sig),alpha*t_sig(t_sig),'.b','MarkerSize',10);
 labels = {'eEEG','t-eEEG','tfce sig','t-test sig'};
