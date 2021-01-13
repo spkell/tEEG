@@ -82,7 +82,7 @@ else
 end
 
 % create neighborhood structure, but keep time points independent
-nh = cosmo_cluster_neighborhood(d,'time',false); % we don't really want to cluster over anything (which treats multiple time points as a single time point).  we want to treat each time point independently, i think.
+nh = cosmo_cluster_neighborhood(d,'time',true); % [RM: I was previously wrong about this.  this neighborhood defines which features are "neighbors", which is necessary for the TFCE] % we don't really want to cluster over anything (which treats multiple time points as a single time point).  we want to treat each time point independently, i think.
 
 % run TFCE (might play around with some options here)
 opt = struct(); % reset options structure
@@ -91,7 +91,7 @@ opt.niter = 10000; % should be near 10k for publication, but can test at lower v
 if length(eeg_type) == 1
     opt.h0_mean = chance; % not allowed in 2-tailed tests
 end
-opt.seed = 1; % should usually not be used, unless exact replication of results is required (keeping for this test script)
+%opt.seed = 1; % should usually not be used, unless exact replication of results is required (keeping for this test script)
 opt.progress = true; % let's show for now
 
 zd = cosmo_montecarlo_cluster_stat(d,nh,opt); % returns TFCE-corrected z-score for each column, the results of a one-sample t-test against 0.5
