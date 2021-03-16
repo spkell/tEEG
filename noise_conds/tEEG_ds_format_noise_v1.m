@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Author: Sean Kelly
-%Filename: tEEG_ds_format_noise_v0.m
+%Filename: tEEG_ds_format_noise_v1.m
 %Date: 10/15/20
 %
 %Purpose: Create tEEG dataset structure to use as sample by feature dataset
@@ -14,22 +14,26 @@
 % additional input is the number of trials that wil be considered for each
 % sample.
 %                                    [clench large, small]
-%Example: tEEG_ds_format_noise_v0(1, [2,1], 1, 100, 0)
+%Example: tEEG_ds_format_noise_v1(1, 2, 1, 100, 1)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function ds = tEEG_ds_format_noise_v0(subject, noise_pos, eeg_type, ntrials_request, parietal)
+function ds = tEEG_ds_format_noise_v1(subject, noise_pos, eeg_type, ntrials_request, parietal)
 
     %load string representations of trial parameters in conditions struct
     conditions = tEEG_conditions();
     
+    if noise_pos == 1 %Clean
+        stim = [1,2]; %Lg, Sm
+    else
+        stim = 1; %Lg stimulus
+    end
+    
     %number of inputs for each parameter
     len_subject = length(subject);
-    len_noise_pos = length(noise_pos);
     len_eeg_type = length(eeg_type);
+    len_stim_size = length(stim);
     
-    %ntrials_total = 100; %some participants have a couple more, 76 for 1419_large_RightCenter
-    
-    ntarget_combinations = length(subject) * length(noise_pos) * length(eeg_type);
+    ntarget_combinations = length(subject) * length(stim) * length(eeg_type);
     
     %{
     target combinations ex:
@@ -40,11 +44,13 @@ function ds = tEEG_ds_format_noise_v0(subject, noise_pos, eeg_type, ntrials_requ
     1a2a 1a2b 1b2a 1b2b 1c2a 1c2b
     %}
     
-    noise_types = {'Center','Clench','Chew'};
+    %ntrials_total = 100; %some participants have a couple more, 76 for 1419_large_RightCenter
+    
+    noise_types = {'Center','Clench','Chew'}; %center is without noise
     
     %identify parameters to load datasets.
-    subject_param = conditions.subject(subject)'; 
-    noise_pos_param = noise_types(noise_pos)';
+    subject_param = conditions.subject(subject)';
+    stim_param = conditions.stim(stim)';
     
     targ_labels = cell(ntarget_combinations,1);%identify labels for each target condition
     ds_targs = cell(ntarget_combinations,1); %set of target datasets
@@ -52,8 +58,8 @@ function ds = tEEG_ds_format_noise_v0(subject, noise_pos, eeg_type, ntrials_requ
     %load dataset for each target condition
     targ = 1;
     for subj=1:len_subject
-        for pos=1:len_noise_pos
-            temp_ds_targs = load_tEEG_data_noise_v0(subject_param{subj}, noise_pos_param{pos}); %12 chans x 494 timepoints x ~100 trials
+        for stim=1:len_stim_size
+            temp_ds_targs = load_tEEG_data_noise_v1(subject_param{subj}, stim_param{stim}, noise_types{noise_pos}); %12 chans x 494 timepoints x ~100 trials
             for eeg=1:len_eeg_type % RM: this loop should work, even if len_eeg_type==1
                 rand_trials = randperm(size(temp_ds_targs.data,3)); %ideally ntrials_total // tEEG_1419_large_RightCenter.mat: ntrials = 76
                 rand_trials = rand_trials(1:ntrials_request);
@@ -82,12 +88,7 @@ function ds = tEEG_ds_format_noise_v0(subject, noise_pos, eeg_type, ntrials_requ
                     end
 
                 end
-                if pos > 1 %clench,chew
-                    stim = 'large';
-                else %Center
-                    stim = 'small';
-                end
-                targ_labels{targ} = strcat(conditions.EEG_type{eeg},'_',subject_param{subj},'_',stim,'_',noise_pos_param{pos});
+                targ_labels{targ} = strcat(conditions.EEG_type{eeg},'_',subject_param{subj},'_',stim_param{stim},'_Center',noise_types{noise_pos});
                 targ = targ + 1;
             end %6 chans x 494 timepoints x n_trials_request
         end

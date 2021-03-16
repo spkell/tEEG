@@ -9,7 +9,9 @@
 % data pertaining to given params
 %
 %                                  [Center,Clench,Chew]
-%Example: load_tEEG_data_v2('0341','Clench')
+%Example: load_tEEG_data_noise_v0('0976','Clench')
+
+%All participants have noise conditions except for 0341
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function data = load_tEEG_data_noise_v0(subject, noise)
@@ -19,9 +21,9 @@ function data = load_tEEG_data_noise_v0(subject, noise)
     directory_path = '~/Documents/GitHub/tEEG/tEEG_checkerboard_data';
     %directory_path = '~/VNL/Projects/tEEG/DataMat'; %dir path in lab
     
-    if strcmp(noise,'Center') %Center
+    if strcmp(noise,'Center') %Small Center, same fix as noise conds
         stim = 'small';
-    else %clench,chew
+    else %large clench,chew conds
         stim = 'large';
     end
 
