@@ -22,9 +22,9 @@
 
 %Classifier conditions
 noises = {'Center','Clench','Chew'};
-noise_pos = 2; %[Center,Clench,Chew]
+noise_pos = 3; %[Center,Clench,Chew]
 eeg_type = [1,2];
-ntrials = 4;
+ntrials = 100;
 parietal = 1; %Include parietal electrode channels
 
 % sample attributes
@@ -38,7 +38,7 @@ chunks = (1:nsamp)';
 ntarget_combinations = length(eeg_type);
 chance = 1 / ntarget_combinations;
 
-repetitions = 1; %number of times to repeat classification
+repetitions = 10; %number of times to repeat classification
 
 %Preallocate memory to store classification of each subject
 class_raw_mat(length(eeg_type),nsamp,nfeat) = zeros();
@@ -76,7 +76,7 @@ nh = cosmo_cluster_neighborhood(d,'time',true); % create neighborhood structure,
 
 opt = struct(); % reset options structure
 opt.cluster_stat = 'tfce';  % Threshold-Free Cluster Enhancement
-opt.niter = 1000;
+opt.niter = 10000;
 
 opt.progress = true;
 zd = cosmo_montecarlo_cluster_stat(d,nh,opt); % returns TFCE-corrected z-score for each column
@@ -86,8 +86,10 @@ f(1) = figure;
 hold on
 t = 1:nfeat;
 
-plot(t,mean(d.samples(1:9,:)),'b'); % mean decoding over time for tEEG
-plot(t,mean(d.samples(10:18,:)),'r'); % mean decoding over time for eEEG
+%Matches eeg type to corresponding plot color
+colors = {'b','r','g'}; %tEEG, eEEG, teEEG 
+plot(t,mean(d.samples(1:9,:)),colors{eeg_type(1)}); % mean decoding over time for EEG type 1
+plot(t,mean(d.samples(10:18,:)),colors{eeg_type(2)}); % mean decoding over time for EEG type 2
 
 ylim([0 1]);
 xlabel('time (ms)');
@@ -100,7 +102,8 @@ zd_sig = abs(zd.samples) > 1.96; % two-tailed (this is really an estimate, assum
 hold on;
 plot(t(zd_sig),.95*zd_sig(zd_sig),'.r','MarkerSize',10);
 
-labels = {'tEEG','eEEG','tfce'};
+EEG_types = {'tEEG','eEEG','t+eEEG'};
+labels = {EEG_types{eeg_type(1)},EEG_types{eeg_type(2)},'tfce'}; 
 legend(labels);
 fig_title = strcat('tEEG_vs_eEEG_',noises{noise_pos},'_trials:',string(ntrials));
 MarkPlot(fig_title);

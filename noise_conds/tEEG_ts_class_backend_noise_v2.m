@@ -35,7 +35,7 @@ function avg_class_score = tEEG_ts_class_backend_noise_v2(subject, noise_pos, ee
     %ds_test = tEEG_ds_format_noise_v1(2, 2, 1, 30, 1);
 
     nfeat = 494;
-    nchan = 6;
+    nchan = size(ds_train.samples,2)/nfeat;
     ntrials = size(ds_test.samples,1);
     targets = ds_train.sa.targets;
 
