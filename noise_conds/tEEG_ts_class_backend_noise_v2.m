@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Author: Sean Kelly
-%Filename: tEEG_ts_class_backend_noise_v1.m
+%Filename: tEEG_ts_class_backend_noise_v10.m
 %Date: 12/29/20
 %
 %Purpose: This classifier performs MVPA analyses on tEEG and eEEG data.
@@ -26,12 +26,15 @@ function avg_class_score = tEEG_ts_class_backend_noise_v2(subject, noise_pos, ee
     %load formatted datasets
     %Params = subject(1:10), noise_condition(1:2), (t/e)EEG(1:2), ntrials(3:100), (1,2)
 
+    ntrain_trials = 100;
+    ntest_trials = ntrials; %varTrials, train on all clean, test on variable noise ntrials
+    
     %Train on large center Vs. small center
-    ds_train = tEEG_ds_format_noise_v1(subject, 1, eeg_type, ntrials, parietal);
+    ds_train = tEEG_ds_format_noise_v1(subject, 1, eeg_type, ntrain_trials, parietal);
     %ds_train = tEEG_ds_format_noise_v1(2, 1, 1, 30, 1);
 
     %Test on clench or chew
-    ds_test = tEEG_ds_format_noise_v1(subject, noise_pos, eeg_type, 100, parietal);
+    ds_test = tEEG_ds_format_noise_v1(subject, noise_pos, eeg_type, ntest_trials, parietal);
     %ds_test = tEEG_ds_format_noise_v1(2, 2, 1, 30, 1);
 
     nfeat = 494;
@@ -50,11 +53,7 @@ function avg_class_score = tEEG_ts_class_backend_noise_v2(subject, noise_pos, ee
 
         prediction = cosmo_classify_lda(train, targets, test);
 
-        for pred=1:length(prediction)
-            if prediction(pred) == 1
-                class_score(time+1) = class_score(time+1) + 1;
-            end
-        end
+        class_score(time+1) = sum(prediction==1); % count number of classifications that are correct 
 
         avg_class_score(time+1) = class_score(time+1)/ntrials;
 
