@@ -21,10 +21,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Classifier conditions
-fix_pos = 1;
+fix_pos = [2,5];
 eeg_type = 1;
-stim_size = (1:2);
-ntrials = 100;
+stim_size = 1;
+ntrials = 76;
 parietal = 1; %Include parietal electrode channels
 
 ntarget_combinations = length(fix_pos) * length(eeg_type) * length(stim_size);

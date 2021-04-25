@@ -22,9 +22,9 @@
 
 %Classifier conditions
 noises = {'Center','Clench','Chew'};
-noise_pos = 3; %[Center,Clench,Chew]
+noise_pos = 2; %[Center,Clench,Chew]
 eeg_type = [1,2];
-ntrials = 100;
+ntrials = 4;
 parietal = 1; %Include parietal electrode channels
 
 % sample attributes

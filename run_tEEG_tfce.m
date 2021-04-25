@@ -28,10 +28,10 @@ parietal = [0,1]; %Compare Parietal omission performance
 %}
 
 %Classifier conditions
-fix_pos = 1;
-eeg_type = 1; %eeg_type = [1,2];
-stim_size = [1,2];
-ntrials = 100;
+fix_pos = [2,5];
+eeg_type = [2,3]; %eeg_type = [1,2];
+stim_size = 1;
+ntrials = 76;
 parietal = 1; %Compare Parietal omission performance
 
 conds = tEEG_conditions(); %load names of experimental conditions
@@ -100,14 +100,16 @@ zd = cosmo_montecarlo_cluster_stat(d,nh,opt); % returns TFCE-corrected z-score f
 f(1) = figure;
 hold on
 
+colors = {'b','r','g'};
+
 t = 1:nfeat;
 if length(eeg_type) == 1
     %plot(t,mean(d.samples),'k'); % mean decoding over time
     confidence_interval = ci(d.samples,95,1);
-    continuous_error_bars(mean(d.samples), t, confidence_interval, 0, 'b',1)
+    continuous_error_bars(mean(d.samples), t, confidence_interval, 0, colors{eeg_type},1)
 else
-    plot(t,mean(d.samples(1:10,:)),'b'); % mean decoding over time for tEEG
-    plot(t,mean(d.samples(11:20,:)),'r'); % mean decoding over time for eEEG
+    plot(t,mean(d.samples(1:10,:)),colors{eeg_type(1)}); % mean decoding over time for tEEG
+    plot(t,mean(d.samples(11:20,:)),colors{eeg_type(2)}); % mean decoding over time for eEEG
 end
 ylim([0 1]);
 xlabel('time (ms)');
@@ -128,13 +130,20 @@ if length(eeg_type) == 1 %mean not informative in 2-tailed test
     plot(t(t_sig),alpha*t_sig(t_sig),'.b','MarkerSize',10);
     labels = {'95% conf',conds.EEG_type{eeg_type},'tfce sig','t-test sig'};
 else
-    labels = {conds.EEG_type{eeg_type(1)},conds.EEG_type{eeg_type(2)},'tfce sig'};
+    alpha = 0.05;
+    [h,p] = ttest(d.samples(1:10,:), d.samples(11:20,:)); % one-sample t-test (each column separately) against chance (0.5 for 2 targets)
+    t_sig = p < alpha; % uncorrected p-value less than alpha = .05
+    plot(t(t_sig),alpha*t_sig(t_sig),'.b','MarkerSize',10);
+    labels = {conds.EEG_type{eeg_type(1)},conds.EEG_type{eeg_type(2)},'tfce sig','t-test sig'};
 end
 legend(labels);
 
 %Label plot with relevent information
 fig_title = tEEG_figure_info(0, fix_pos, eeg_type, stim_size, ntrials);
 MarkPlot(fig_title);
+
+orient landscape
+print('-dpdf','new_fig.pdf') %save as pdf
 
 %{
 
@@ -177,5 +186,5 @@ labels = {'eEEG','t-eEEG','tfce sig','t-test sig'};
 legend(labels);
 
 orient landscape
-print('-dpdf','new_fig') %save as pdf
+print('-dpdf','new_fig.pdf') %save as pdf
 %}

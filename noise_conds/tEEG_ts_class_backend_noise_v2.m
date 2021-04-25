@@ -26,7 +26,7 @@ function avg_class_score = tEEG_ts_class_backend_noise_v2(subject, noise_pos, ee
     %load formatted datasets
     %Params = subject(1:10), noise_condition(1:2), (t/e)EEG(1:2), ntrials(3:100), (1,2)
 
-    ntrain_trials = 100;
+    ntrain_trials = 100; %100
     ntest_trials = ntrials; %varTrials, train on all clean, test on variable noise ntrials
     
     %Train on large center Vs. small center

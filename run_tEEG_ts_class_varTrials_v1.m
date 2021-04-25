@@ -30,17 +30,17 @@
 nsubjects = 10; %all subjects
 %nsubjects = 1; %DEBUG: only 1 subject to reduce time complexity by 10x
 
-fix_pos = 1;
-stim_size = [1,2];
+fix_pos = [3,4,6,7];
+stim_size = 1;
 
 ntrials = 100; %all trials
 %ntrials = 15; %DEBUG: small number of trials
-valid_trials = (3:ntrials); % 3 <= valid_trials <= 100
+valid_trials = (5:ntrials); % 3 <= valid_trials <= 100
 
-ntrial_steps = 5; %number of steps between trial size taken in by the classifier
+ntrial_steps = 1; %number of steps between trial size taken in by the classifier
 trial_sel = valid_trials(2:ntrial_steps:end); %selected ntrial lengths to examine
 len_trial_sel = length(trial_sel);
-eeg_types = [1,2,3];
+eeg_types = [1,2];
 
 %retrieve participant conditions
 conditions = tEEG_conditions();
@@ -76,42 +76,40 @@ end
 
 
 %calculate integral of each subject's classification vector
-roc_indiv_zeros(1:nsubjects,size(eeg_types,2),len_trial_sel) = zeros(); %10subjects * n_eeg_types * ntrials_selected
+roc_indiv_zeros(1:nsubjects,size(eeg_types,2),len_trial_sel) = zeros(); %10subjects * 2 n_eeg_types * 97 ntrials_selected
 roc_indiv = roc_indiv_zeros;
 for eeg_type=1:size(eeg_types,2)
     for subject=1:nsubjects
         for trial_count=1:len_trial_sel
-            roc_indiv(subject,eeg_type,trial_count) = integral_sl_map(time_values,ts_class_mat(subject,:,trial_count,eeg_type));
+            roc_indiv(subject,eeg_type,trial_count) = mean(ts_class_mat(subject,:,trial_count,eeg_type)); %integral_sl_map(time_values,ts_class_mat(subject,:,trial_count,eeg_type));
         end
     end
 end
 
 
-%Plot each subject's tEEG vs eEEG ROC curve separately
-f(1) = figure;
-for subject=1:nsubjects
-    subplot(ceil(nsubjects/2),2,subject); %formats figure to show plots for each subjects
-    for eeg_type=1:size(eeg_types,2)
-        roc_vector = squeeze(roc_indiv(subject,eeg_type,:));
-        plot(trial_sel,roc_vector);
-        hold on
-    end
-    
-    %Configure individual classification plot
-    xlim([min(3),max(trial_sel)]);
-    ylabel('Classifier Integral'); %Class Accuracy * ms
-    xlabel('Trials Used to Train Classifier');
-    title_string = strcat('ROC: tEEG vs eEEG vs teEEG // Subject: ', conditions.subject{subject});
-    title(title_string);
-    legend('tEEG','eEEG','teEEG');
-    %hline(0,'chance');
-    hold off
-end
-figure_title = tEEG_figure_info(0,fix_pos,0,stim_size,0);
-MarkPlot(figure_title);
+% %Plot each subject's tEEG vs eEEG ROC curve separately
+% f(1) = figure;
+% for subject=1:nsubjects
+%     subplot(ceil(nsubjects/2),2,subject); %formats figure to show plots for each subjects
+%     for eeg_type=1:size(eeg_types,2)
+%         roc_vector = squeeze(roc_indiv(subject,eeg_type,:));
+%         plot(trial_sel,roc_vector);
+%         hold on
+%     end
+%     
+%     %Configure individual classification plot
+%     xlim([min(3),max(trial_sel)]);
+%     ylabel('Classifier Integral'); %Class Accuracy * ms
+%     xlabel('Trials Used to Train Classifier');
+%     title_string = strcat('AUC: tEEG vs eEEG // Subject: ', conditions.subject{subject});
+%     title(title_string);
+%     legend('tEEG','eEEG');
+%     %hline(0,'chance');
+%     hold off
+% end
+% figure_title = tEEG_figure_info(0,fix_pos,0,stim_size,0);
+% MarkPlot(figure_title);
 
-
-f(2) = figure; %figure to display roc of both eeg types for avg of all subjects
 
 %Find 95% confidence interval for mean of all subjects AUC x ntrials
 %using each participants independent AUC's, for both tEEG and eEEG
@@ -132,58 +130,98 @@ roc = roc_zeros; %resets size in case of larger roc matrix loaded
 %calculate integral of each average classification vector
 for eeg_type=1:size(eeg_types,2) %tEEG and eEEG
     for trial_count=1:len_trial_sel
-        %store area under curve for each classification plot for each 
-        roc(eeg_type,trial_count) = integral_sl_map(time_values,class_avg(:,trial_count,eeg_type)); %2eeg x 98trials
+        
+%         %store area under curve for each classification plot for each 
+%         roc(eeg_type,trial_count) = integral_sl_map(time_values,class_avg(:,trial_count,eeg_type)); %2eeg x 98trials
+
+        roc(eeg_type,trial_count) = mean(class_avg(:,trial_count,eeg_type));
     end
 end
 
+f(2) = figure; %figure to display roc of both eeg types for avg of all subjects
+hold on
+colors = {'b','r','g'};
 %Plot average area under curve for tEEG and eEEG
-chance = 0;
-color = 'b';
-for eeg=1:size(eeg_types,2)
-    if eeg == 2
-        color = 'r';
-    elseif eeg == 3
-        color = 'g';
-    end
-    continuous_error_bars(roc(eeg,:), trial_sel, confidence_interval_eeg(eeg,:), 0, color, 0)
-    hold on
-end
-color = 'b';
-for eeg=1:size(eeg_types,2)
-    if eeg == 2
-        color = 'r';
-    elseif eeg == 3
-        color = 'g';
-    end
+ntarg_combos = length(fix_pos) * length(stim_size);
+chance = 1/ntarg_combos;
+
+% for eeg=1:length(eeg_types)
+%     color = colors{eeg_types(eeg)};
+%     continuous_error_bars(roc(eeg,:), trial_sel, confidence_interval_eeg(eeg,:), 0, color, 0)
+%     hold on
+% end
+
+for eeg=1:length(eeg_types)
+    color = colors{eeg_types(eeg)};
     plot(trial_sel, roc(eeg,:), color, 'LineWidth', 3)
 end
 
 %Configure average classification plot
 xlim([min(trial_sel),max(trial_sel)]);
-ylabel('Area Under Curve (Class Accuracy * ms)');
+ylabel('Area Under Curve (Class Accuracy)');
 xlabel('Trials Used to Train Classifier');
 title('Average Area Under Curve: tEEG vs eEEG');
 legend('tEEG','eEEG');
-hline(0,'k','chance');
+hline(chance,'k','chance');
+set(gca,'ytick',.4:.05:.7)
+ylim([.4, .7])
 figure_title = tEEG_figure_info(0,fix_pos,0,stim_size,0);
 MarkPlot(figure_title);
 
+% mark locations where performance is "significant" by uncorrected t-tests
+t = 1:494;
+alpha = 0.24;
+[h,p] = ttest(squeeze(roc_indiv(:,1,:)), squeeze(roc_indiv(:,2,:))); % one-sample t-test (each column separately) against chance (0.5 for 2 targets)
+t_sig = p < alpha; % uncorrected p-value less than alpha = .05
+plot(t(t_sig)+5,alpha*t_sig(t_sig),'.b','MarkerSize',10);
+labels = {conditions.EEG_type{eeg_types(1)},conditions.EEG_type{eeg_types(2)},'t-test sig'};
 
-%Display surface plot of given eeg type in separate figures
-f(3) = figure;
-f(4) = figure;
-for eeg=1:size(class_avg,3)
-    figure(2+eeg)
-    eeg_sample = class_avg(:,:,eeg);
-    eeg_sample = squeeze(eeg_sample);
-    surf(eeg_sample) %TODO: change ntrials axes to go to 100 instead of nsteps
-    xlabel('Trials Used to Train Classifier');
-    ylabel('Timepoints (ms)');
-    zlabel('classification accuracy');
-    figure_title = tEEG_figure_info(0,fix_pos,eeg,stim_size,0);
-    MarkPlot(figure_title);
-end 
+figure()
+hold on
+class_avg = squeeze(mean(ts_class_mat(:,:,:,1),1)); %1 x 494cl-performance x 98trials
+imagesc(class_avg', [0, .4]);
+colorbar();
+title('tEEG - Classification Accuracy as Training Set is Increased');
+ylabel('Trials Used to Train Classifier');
+xlabel('Timepoints (ms)');
+set(gca,'ytick',0:5:100)
+ylim([0,100]);
+set(gca,'xtick',0:50:494)
+xlim([0,100]);
+
+
+figure()
+hold on
+class_avg = squeeze(mean(ts_class_mat(:,:,:,2),1)); %1 x 494cl-performance x 98trials
+imagesc(class_avg', [0, .4]);
+colorbar();
+title('eEEG - Classification Accuracy as Training Set is Increased');
+ylabel('Trials Used to Train Classifier');
+xlabel('Timepoints (ms)');
+set(gca,'ytick',0:5:95)
+ylim([0,71]);
+set(gca,'xtick',0:50:494)
+xlim([0,494]);
+
+%{
+orient landscape
+print('-dpdf',"new_fig.pdf") %save as pdf
+%}
+
+% %Display surface plot of given eeg type in separate figures
+% f(3) = figure;
+% f(4) = figure;
+% for eeg=1:size(class_avg,3)
+%     figure(2+eeg)
+%     eeg_sample = class_avg(:,:,eeg);
+%     eeg_sample = squeeze(eeg_sample);
+%     surf(eeg_sample) %TODO: change ntrials axes to go to 100 instead of nsteps
+%     xlabel('Trials Used to Train Classifier');
+%     ylabel('Timepoints (ms)');
+%     zlabel('classification accuracy');
+%     figure_title = tEEG_figure_info(0,fix_pos,eeg,stim_size,0);
+%     MarkPlot(figure_title);
+% end 
 
 %{
 %%%%% To produce figures in summary %%%%%
@@ -235,10 +273,10 @@ xlabel('Time (ms)');
 title("eEEG - Classification Accuracy as Training Set is Increased")
 
 orient landscape
-print('-dpdf',"var_trials_eEEG") %save as pdf
+print('-dpdf',"new_fig.pdf") %save as pdf
 
-%{
 %Save figures for each script run in one file
 file_name = strcat('ts_class_outputs/tEEG_ts_class_varTrials/autosave/',figure_title,'.fig');
-%}
 savefig(f,file_name)
+
+%}

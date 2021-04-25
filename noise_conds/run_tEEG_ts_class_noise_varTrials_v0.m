@@ -57,7 +57,7 @@ for eeg=1:length(eeg_types)
             for rep=1:repetitions
                 
                 %runs ts classification
-                sample_map = tEEG_ts_class_backend_noise_v2(subject+1, noise_pos, eeg, ntrials, parietal); %1class-score x 494timepoints
+                sample_map = tEEG_ts_class_backend_noise_v2(subject+1, noise_pos, eeg, trial_sel(trial_count), parietal); %1class-score x 494timepoints
                 sample_sum = sample_sum + sample_map;
             end
             
