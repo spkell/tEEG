@@ -55,7 +55,7 @@ function zd_sig = tEEG_tfce_backend(ds,comparison)
     % run TFCE (might play around with some options here)
     opt = struct(); % reset options structure
     opt.cluster_stat = 'tfce';  % Threshold-Free Cluster Enhancement
-    opt.niter = 1000; % should be near 10k for publication, but can test at lower values
+    opt.niter = 10000; % should be near 10k for publication, but can test at lower values
     if comparison == 0
         opt.h0_mean = chance; % not allowed in 2-tailed tests
     end

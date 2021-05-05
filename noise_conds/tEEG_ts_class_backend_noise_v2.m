@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Author: Sean Kelly
-%Filename: tEEG_ts_class_backend_noise_v10.m
+%Filename: tEEG_ts_class_backend_noise_v2.m
 %Date: 12/29/20
 %
 %Purpose: This classifier performs MVPA analyses on tEEG and eEEG data.

@@ -28,10 +28,10 @@ parietal = [0,1]; %Compare Parietal omission performance
 %}
 
 %Classifier conditions
-fix_pos = [2,5];
-eeg_type = [2,3]; %eeg_type = [1,2];
-stim_size = 1;
-ntrials = 76;
+fix_pos = 1;
+eeg_type = [1,2]; %eeg_type = [1,2];
+stim_size = [1,2];
+ntrials = 100;
 parietal = 1; %Compare Parietal omission performance
 
 conds = tEEG_conditions(); %load names of experimental conditions
@@ -142,8 +142,10 @@ legend(labels);
 fig_title = tEEG_figure_info(0, fix_pos, eeg_type, stim_size, ntrials);
 MarkPlot(fig_title);
 
+%{
 orient landscape
 print('-dpdf','new_fig.pdf') %save as pdf
+%}
 
 %{
 

@@ -30,10 +30,10 @@
 nsubjects = 10; %all subjects
 %nsubjects = 1; %DEBUG: only 1 subject to reduce time complexity by 10x
 
-fix_pos = [3,4,6,7];
+fix_pos = [2,5];
 stim_size = 1;
 
-ntrials = 100; %all trials
+ntrials = 75; %all trials
 %ntrials = 15; %DEBUG: small number of trials
 valid_trials = (5:ntrials); % 3 <= valid_trials <= 100
 
@@ -138,7 +138,8 @@ for eeg_type=1:size(eeg_types,2) %tEEG and eEEG
     end
 end
 
-f(2) = figure; %figure to display roc of both eeg types for avg of all subjects
+
+figure(); %figure to display roc of both eeg types for avg of all subjects
 hold on
 colors = {'b','r','g'};
 %Plot average area under curve for tEEG and eEEG
@@ -158,48 +159,83 @@ end
 
 %Configure average classification plot
 xlim([min(trial_sel),max(trial_sel)]);
-ylabel('Area Under Curve (Class Accuracy)');
-xlabel('Trials Used to Train Classifier');
-title('Average Area Under Curve: tEEG vs eEEG');
-legend('tEEG','eEEG');
+%ylabel('Area Under Curve (Class Accuracy)');
+%xlabel('Trials Used to Train Classifier');
+%title('Average Area Under Curve: tEEG vs eEEG');
+%legend('tEEG','eEEG');
+
+if chance == 0.25
+hline(chance,'k','chance');
+set(gca,'ytick',.225:.025:.3)
+ylim([.225, .3])
+elseif chance == 0.5
 hline(chance,'k','chance');
 set(gca,'ytick',.4:.05:.7)
 ylim([.4, .7])
-figure_title = tEEG_figure_info(0,fix_pos,0,stim_size,0);
-MarkPlot(figure_title);
+end
+%figure_title = tEEG_figure_info(0,fix_pos,0,stim_size,0);
+%MarkPlot(figure_title);
+
+clear d nh zd
+d.samples = [squeeze(roc_indiv(:,1,:));squeeze(roc_indiv(:,2,:))];
+
+% feature attributes
+nfeat = ntrials-5;
+d.fa.time = 1:nfeat;
+d.a.fdim.labels = {'time'};
+d.a.fdim.values = {1:nfeat};
+
+nsamp = 10;
+targets = ones(nsamp,1); 
+chunks = (1:nsamp)';
+d.sa.targets = [targets;2*targets];
+d.sa.chunks = [chunks;chunks];
+
+% create neighborhood structure, but keep time points independent
+nh = cosmo_cluster_neighborhood(d,'time',true);
+opt = struct(); % reset options structure
+opt.cluster_stat = 'tfce';  % Threshold-Free Cluster Enhancement
+opt.niter = 10000;
+opt.progress = true;
+zd = cosmo_montecarlo_cluster_stat(d,nh,opt); 
+
+% mark location where performance is "significant" by tfce
+zd_sig = abs(zd.samples) > 1.96; % two-tailed (this is really an estimate, assuming a large sample size - we need to look up threshold for n=10 for out study)
+hold on;
+plot(t(zd_sig),.6*zd_sig(zd_sig),'.r','MarkerSize',10);
 
 % mark locations where performance is "significant" by uncorrected t-tests
 t = 1:494;
-alpha = 0.24;
+alpha = 0.05;
 [h,p] = ttest(squeeze(roc_indiv(:,1,:)), squeeze(roc_indiv(:,2,:))); % one-sample t-test (each column separately) against chance (0.5 for 2 targets)
 t_sig = p < alpha; % uncorrected p-value less than alpha = .05
-plot(t(t_sig)+5,alpha*t_sig(t_sig),'.b','MarkerSize',10);
-labels = {conditions.EEG_type{eeg_types(1)},conditions.EEG_type{eeg_types(2)},'t-test sig'};
+plot(t(t_sig)+5,.45*t_sig(t_sig),'.b','MarkerSize',10);
+%labels = {conditions.EEG_type{eeg_types(1)},conditions.EEG_type{eeg_types(2)},'t-test sig'};
 
 figure()
 hold on
 class_avg = squeeze(mean(ts_class_mat(:,:,:,1),1)); %1 x 494cl-performance x 98trials
-imagesc(class_avg', [0, .4]);
+imagesc(class_avg', [.3, .8]);
 colorbar();
 title('tEEG - Classification Accuracy as Training Set is Increased');
 ylabel('Trials Used to Train Classifier');
 xlabel('Timepoints (ms)');
-set(gca,'ytick',0:5:100)
-ylim([0,100]);
+set(gca,'ytick',0:10:100)
+ylim([0,95]);
 set(gca,'xtick',0:50:494)
-xlim([0,100]);
+xlim([0,494]);
 
 
 figure()
 hold on
 class_avg = squeeze(mean(ts_class_mat(:,:,:,2),1)); %1 x 494cl-performance x 98trials
-imagesc(class_avg', [0, .4]);
+imagesc(class_avg', [.3, .8]);
 colorbar();
 title('eEEG - Classification Accuracy as Training Set is Increased');
 ylabel('Trials Used to Train Classifier');
 xlabel('Timepoints (ms)');
-set(gca,'ytick',0:5:95)
-ylim([0,71]);
+set(gca,'ytick',0:10:100)
+ylim([0,95]);
 set(gca,'xtick',0:50:494)
 xlim([0,494]);
 
