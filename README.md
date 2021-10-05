@@ -3,7 +3,7 @@ Collection of files used for MVPA of visual evoked potentials generated with tri
 
 The tEEG dataset was generated at UNR, Nevada.
 
-This data analysis is conducted through the College of the Holy Cross as a component of Psychology Research for Credit (PSYC480) through the Visual Neuroscience Lab.
+This data analysis is conducted through the College of the Holy Cross as a component of Psychology Research for Credit (PSYC480) through the Visual Neuroscience Lab, and was presented at the Visual Sciences Society 2021 Conference (https://youtu.be/53gX8piGXF4).
 
 Analyses Theory
 
